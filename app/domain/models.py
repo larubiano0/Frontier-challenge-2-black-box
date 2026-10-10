@@ -6,13 +6,15 @@ from dataclasses import dataclass, field
 class Account:
     id: str
     owner: str = ""
-    balance: int = 0
+    balance: int = 0          # integer cents
+    fail_streak: int = 0      # consecutive TRANSFER failures (E506/E507) as source
+    intentos: int = 0         # E510 answers since the account got blocked
 
 
 @dataclass
 class Operation:
     id: str
-    kind: str = ""
+    kind: str = ""            # "DEPOSITO" | "TRANSFER"
     cancelled: bool = False
     data: dict = field(default_factory=dict)
 
@@ -21,6 +23,5 @@ class Operation:
 class State:
     accounts: dict[str, Account] = field(default_factory=dict)
     operations: dict[str, Operation] = field(default_factory=dict)
-    history: list[str] = field(default_factory=list)  # operation ids in order
     next_account_seq: int = 1
     next_operation_seq: int = 1

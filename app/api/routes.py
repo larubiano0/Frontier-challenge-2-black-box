@@ -1,32 +1,52 @@
-"""HTTP routing. Body is read raw (no pydantic models) so exact original
-HTTP behavior can be reproduced later."""
-from fastapi import APIRouter, Request
+"""HTTP layer: one catch-all handler so FastAPI/Starlette defaults (404/405/422,
+trailing-slash redirects) never leak.
 
-from app.core.auth import is_authorized, unauthorized_response
-from app.services.dispatcher import handle_msg
+Order (reports/handoff_implementation.md §1):
+  1. route + method: only GET /health, POST /__reset, POST /msg exist; anything
+     else (other method, other path, '/msg/', '/MSG') -> 404 E404, before auth
+     (ids 70-77, 91, 92).
+  2. auth on known routes -> 401 E001 (ids 65-69).
+  3. route handler.
+"""
+import json
+from itertools import count
+
+from starlette.requests import Request
+from starlette.responses import Response
+
+from app.core.auth import is_authorized
+from app.domain.errors import ServiceError, e001, e404
+from app.services.dispatcher import process
 from app.storage.memory import store
 
-router = APIRouter()
+_KNOWN = {("GET", "/health"), ("POST", "/__reset"), ("POST", "/msg")}
+
+# X-Req: +1 per authorized POST /msg, NOT reset by /__reset (log ids 21-23). Headers are not
+# scored; kept for fidelity only [probable].
+_x_req = count(1)
 
 
-@router.get("/health")
-async def health(request: Request):
-    # Auth requirement on /health is unconfirmed; README says all calls carry the token.
+def json_response(status: int, body: dict, headers: dict | None = None) -> Response:
+    content = json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return Response(content, status_code=status, headers=headers,
+                    media_type="application/json; charset=utf-8")
+
+
+def error_response(err: ServiceError) -> Response:
+    return json_response(err.status, err.body())
+
+
+async def handle(request: Request) -> Response:
+    key = (request.method.upper(), request.url.path)
+    if key not in _KNOWN:
+        return error_response(e404())
     if not is_authorized(request):
-        return unauthorized_response()
-    return {"status": "ok"}  # body is a placeholder (supuesto)
-
-
-@router.post("/__reset")
-async def reset(request: Request):
-    if not is_authorized(request):
-        return unauthorized_response()
-    store.reset()
-    return {"ok": True}  # body is a placeholder (supuesto)
-
-
-@router.post("/msg")
-async def msg(request: Request):
-    if not is_authorized(request):
-        return unauthorized_response()
-    return await handle_msg(await request.body(), store)
+        return error_response(e001())
+    if key == ("GET", "/health"):
+        return json_response(200, {"ok": True})                    # id 64
+    if key == ("POST", "/__reset"):
+        store.reset()                                              # clears accounts, ops, counters, blocks
+        return json_response(200, {"ok": True})                    # id 1
+    raw = await request.body()
+    status, body = process(raw, store)                             # synchronous -> atomic per request
+    return json_response(status, body, {"X-Req": str(next(_x_req))})

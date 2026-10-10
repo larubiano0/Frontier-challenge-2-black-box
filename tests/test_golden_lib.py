@@ -65,8 +65,13 @@ def test_suites_are_separated_by_version():
 
 
 def test_every_v2_fixture_starts_with_explicit_reset_and_cites_sources():
+    from tools.build_golden import STATELESS_SEQUENCES
     for s in gl.load_sequences("v2"):
-        assert s["steps"][0]["kind"] == "reset" and s["steps"][0]["path"] == "/__reset"
+        if s["sequence_id"] in STATELESS_SEQUENCES:
+            # explicitly allow-listed, state-independent probes (justified in build_golden.py)
+            assert s["provenance"].get("stateless_without_reset")
+        else:
+            assert s["steps"][0]["kind"] == "reset" and s["steps"][0]["path"] == "/__reset"
         for st in s["steps"]:
             assert isinstance(st["source_experiment_id"], int) and st["expected"] is not None
 

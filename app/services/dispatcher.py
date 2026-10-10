@@ -1,43 +1,42 @@
-"""Command dispatch and validation precedence.
+"""`POST /msg` pipeline (after route + auth). Pure function of (body, state).
 
-Precedence implemented (ONLY partially evidenced -> `supuesto`):
-  1. body/`m` shape                       [?]  -> Unevidenced (501 placeholder)
-  2. control format (digits only)         [v2] id 18 (E201); order vs. 3-5 is [default]
-  3. control VALUE (E202)                 NOT IMPLEMENTED: the algorithm is unknown
-                                          (v2 id 3 `ALTA;Lucia;83` -> E202 cannot be reproduced)
-  4. command known (case-insensitive)     [v2] id 13 (E301), id 12 (`CONSULTa` accepted)
-  5. arity                                [v2] id 21 (E302)
-  6. handler (accounts, limit, balance...)
+Order (reports/handoff_implementation.md §1):
+  3-7. parse: E101 size -> E100 json -> E102 `m` -> E103 no ';' -> E104 empty segment
+  8.   PING (case-insensitive, exact) skips the control checks (ids 52, 53, 95, 104-108)
+  9.   control format ^[0-9]{1,2}$, last segment only    -> E201
+  10.  control value (app/domain/control.py)             -> E202 (before E301/E302: ids 54, 56, 121)
+  11.  command, case-insensitive                         -> E301 (+ optional `sugerencia`)
+  12.  arity                                             -> E302
+  13.  handler (accounts, amounts, limits, blocking ...)
 """
-from fastapi.responses import JSONResponse, Response
+import re
 
-from app.domain.errors import ServiceError, Unevidenced, e201, e301, e302
+from app.domain import rules
+from app.domain.control import control_matches
+from app.domain.errors import ServiceError, e201, e202, e301, e302
 from app.protocol.parser import parse_message
-from app.services.commands import COMMANDS
+from app.services.commands import COMMANDS, Reply
 from app.storage.base import Store
 
-NOT_IMPLEMENTED = {"error": "not_implemented"}  # skeleton placeholder, NOT the original's behavior
+_CONTROL_RE = re.compile(r"[0-9]{1,2}")   # ASCII only, no sign/space/newline (ids 112, 113, 2798)
 
 
-def _control_is_well_formed(control: str) -> bool:
-    return control.isascii() and control.isdigit()  # [v2] id 18: "5X" malformed; "3" (unpadded) accepted [v1] EX-4
-
-
-async def handle_msg(raw_body: bytes, store: Store) -> Response:
+def process(raw_body: bytes, store: Store) -> tuple[int, dict]:
     try:
         msg = parse_message(raw_body)
-        if not _control_is_well_formed(msg.control):
-            raise e201()
-        # TODO(evidence): control VALUE check (E202) once the algorithm is known.
-        entry = COMMANDS.get(msg.command.upper())
+        name = msg.command.upper()
+        if name != "PING":
+            if not _CONTROL_RE.fullmatch(msg.control):
+                raise e201()
+            if not control_matches(msg.body_without_control, msg.control):
+                raise e202()
+        entry = COMMANDS.get(name)
         if entry is None:
-            raise e301()
+            raise e301(rules.suggest_command(msg.command, list(COMMANDS)))
         arity, handler = entry
         if len(msg.args) != arity:
             raise e302()
-        reply = handler(store.get_state(), msg.args)
-        return JSONResponse(reply.body, status_code=reply.status)
+        reply: Reply = handler(store.get_state(), msg.args)
+        return reply.status, reply.body
     except ServiceError as err:
-        return JSONResponse(err.body(), status_code=err.status)
-    except Unevidenced:
-        return JSONResponse(NOT_IMPLEMENTED, status_code=501)
+        return err.status, err.body()

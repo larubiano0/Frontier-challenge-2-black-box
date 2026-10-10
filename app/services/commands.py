@@ -1,15 +1,13 @@
-"""Command handlers: PING, ALTA, CONSULTA, DEPOSITO, TRANSFER, ANULA.
+"""Command handlers: PING, ALTA, CONSULTA, DEPOSITO, TRANSFER, ANULA (v2).
 
-Legend: [v2] observed in the v2 log; [S-n] v2 `supuesto` rule (domain/rules.py);
-[v1] only seen in the historical v1 examples -> `supuesto`; [default] chosen
-default with no evidence; [?] no evidence and no reasonable default ->
-`Unevidenced` (explicit 501 placeholder).
+Every rule cites experiment ids (experimentos.jsonl); `[supuesto]` marks
+defaults that were not probed. Handler precedence: reports/handoff_implementation.md §2.
 """
 from dataclasses import dataclass
 from typing import Callable
 
 from app.domain import rules
-from app.domain.errors import ServiceError, Unevidenced, e401, e402, e506, e507
+from app.domain.errors import e303, e304, e401, e402, e506, e507, e510
 from app.domain.models import Account, Operation, State
 
 
@@ -20,97 +18,105 @@ class Reply:
 
 
 def _amount(text: str) -> int:
-    # [?] only plain positive integers are evidenced (700, 40000, 250000 ...).
-    if not (text.isascii() and text.isdigit()) or text.startswith("0"):
-        raise Unevidenced(f"amount {text!r}: negative/zero/decimal/leading-zero/non-numeric semantics unknown")
-    return int(text)
+    amount = rules.parse_amount(text)
+    if amount is None:
+        raise e303()
+    return amount
 
 
 def _account(state: State, account_id: str) -> Account:
-    acc = state.accounts.get(account_id)  # [v2] id 16: unknown account -> E401 (exact-match ids [default])
+    acc = state.accounts.get(account_id)  # exact, case-sensitive match (ids 111, 114)
     if acc is None:
         raise e401()
     return acc
 
 
 def _new_operation(state: State, kind: str, data: dict) -> Operation:
-    op = Operation(id=f"OP-{state.next_operation_seq:04d}", kind=kind, data=data)  # [v2] ids 7,8,19
-    state.next_operation_seq += 1   # consumed ONLY on success [v2] id 19 (OP-0003 after a rejected TRANSFER)
+    op = Operation(id=f"OP-{state.next_operation_seq:04d}", kind=kind, data=data)
+    state.next_operation_seq += 1   # consumed ONLY on success (id 19)
     state.operations[op.id] = op
-    state.history.append(op.id)
     return op
 
 
+def _clear_block(acc: Account) -> None:
+    acc.fail_streak = 0
+    acc.intentos = 0
+
+
 def ping(state: State, args: list[str]) -> Reply:
-    return Reply(200, {"pong": True})                                  # [v2] id 2
+    return Reply(200, {"pong": True})                                   # id 2
 
 
 def alta(state: State, args: list[str]) -> Reply:
-    (owner,) = args
-    if owner == "":
-        raise Unevidenced("ALTA with empty name: unknown")
-    acc = Account(id=f"AC-{state.next_account_seq:04d}", owner=owner)  # [v2] ids 4, 5
-    state.next_account_seq += 1                                        # only on success [v2] ids 3-5
-    state.accounts[acc.id] = acc                                       # [default] duplicate names allowed
+    (owner,) = args                                                     # any non-empty name (ids 2778, 2779)
+    acc = Account(id=f"AC-{state.next_account_seq:04d}", owner=owner)   # ids 4, 5
+    state.next_account_seq += 1                                         # only on success (ids 3-5)
+    state.accounts[acc.id] = acc                                        # duplicates allowed (ids 943-945)
     return Reply(201, {"cuentaId": acc.id})
 
 
 def consulta(state: State, args: list[str]) -> Reply:
     (account_id,) = args
     acc = _account(state, account_id)
-    return Reply(200, {"cuenta_id": acc.id, "saldo": rules.format_saldo(acc.balance)})  # [S-1] ids 6,9,12,20
+    return Reply(200, {"cuenta_id": acc.id, "saldo": rules.format_saldo(acc.balance)})
 
 
 def deposito(state: State, args: list[str]) -> Reply:
     account_id, amount_text = args
-    acc = _account(state, account_id)          # [default] E401 for DEPOSITO too (only CONSULTA evidenced)
-    amount = _amount(amount_text)
-    acc.balance += amount                      # [v2] id 20: 700 deposited -> "407.00"; no limit [v2] id 7
+    amount = _amount(amount_text)              # E303 before E401 (ids 1470, 1148)
+    acc = _account(state, account_id)
+    acc.balance += amount                      # cents (id 1395); no limit
+    _clear_block(acc)                          # successful deposit unblocks (ids 2074-2077, 2327-2332)
     op = _new_operation(state, "DEPOSITO", {"account": acc.id, "amount": amount})
-    return Reply(200, {"status": "recieved", "operacionId": op.id})   # sic "recieved" [v2] id 7
+    return Reply(200, {"status": "recieved", "operacionId": op.id})    # sic "recieved"
 
 
 def transfer(state: State, args: list[str]) -> Reply:
     src_id, dst_id, amount_text = args
-    src = _account(state, src_id)              # [default] order: src, dst, amount, limit, balance
+    amount = _amount(amount_text)              # E303 first, even with bogus accounts (id 1516)
+    if src_id == dst_id:                       # E304 even if the account does not exist (id 1550)
+        raise e304()
+    src = _account(state, src_id)
     dst = _account(state, dst_id)
-    amount = _amount(amount_text)
-    if src.id == dst.id:
-        raise Unevidenced("TRANSFER to the same account: unknown")
-    if rules.transfer_exceeds_limit(amount):   # [S-2] ids 10, 11 (checked BEFORE balance [default]: order unknown)
+    if src.fail_streak >= rules.BLOCK_AFTER_FAILURES:
+        # E510 after E303/E304/E401, before E506/E507 (ids 2142-2146). E510 answers do not
+        # add to fail_streak [supuesto]; `intentos` counts them, uncapped [supuesto].
+        src.intentos += 1
+        raise e510(src.intentos)
+    if rules.transfer_exceeds_limit(amount):   # before balance (ids 49, 50)
+        src.fail_streak += 1
         raise e506()
-    if src.balance < amount:                   # [v2] id 17
+    if amount > src.balance:                   # ids 17, 2013-2017
+        src.fail_streak += 1
         raise e507()
     src.balance -= amount
-    dst.balance += amount                      # [v2] id 9: "400.00" after 40000
+    dst.balance += amount
+    _clear_block(src)                          # successful transfer resets the streak (ids 2025-2031)
     op = _new_operation(state, "TRANSFER", {"src": src.id, "dst": dst.id, "amount": amount})
     return Reply(200, {"status": "recieved", "operacionId": op.id})
 
 
 def anula(state: State, args: list[str]) -> Reply:
     (op_id,) = args
-    op = state.operations.get(op_id)
+    op = state.operations.get(op_id)           # exact, case-sensitive (ids 2547, 2592, 2652, 2725)
     if op is None:
-        raise e402()                           # [S-3] v2 ids 14, 15
+        raise e402()
     if op.cancelled:
-        return Reply(200, {"ok": False, "motivo": "ya anulada"})       # [v1] EX-14 (unverified in v2)
-    # Reversal of the balance effect: [v1] inferred from EX-16/19 (unverified in v2).
+        return Reply(200, {"ok": False, "motivo": "ya anulada"})        # ids 31, 2413
+    # Unconditional reversal, balances may go negative (ids 2410-2411, 2489-2491).
+    # Does not touch fail_streak / block state (ids 2146, 2220) [supuesto for unblocking].
+    amount = op.data["amount"]
     if op.kind == "DEPOSITO":
-        acc = state.accounts[op.data["account"]]
-        if acc.balance < op.data["amount"]:
-            raise Unevidenced("ANULA of a DEPOSITO whose funds were already spent: unknown")
-        acc.balance -= op.data["amount"]
+        state.accounts[op.data["account"]].balance -= amount
     else:
-        src, dst = state.accounts[op.data["src"]], state.accounts[op.data["dst"]]
-        if dst.balance < op.data["amount"]:
-            raise Unevidenced("ANULA of a TRANSFER whose funds were already spent: unknown")
-        dst.balance -= op.data["amount"]
-        src.balance += op.data["amount"]
+        state.accounts[op.data["dst"]].balance -= amount
+        state.accounts[op.data["src"]].balance += amount
     op.cancelled = True
-    return Reply(200, {"ok": True, "anulada": op.id})                  # [v1] EX-13 (unverified in v2)
+    return Reply(200, {"ok": True, "anulada": op.id})                  # ids 29, 2220, 2410, 2489
 
 
-# name -> (number of args between command and control, handler)
+# name -> (number of args between command and control, handler).  Order matters for
+# E301 suggestion tie-breaks [supuesto].
 COMMANDS: dict[str, tuple[int, Callable[[State, list[str]], Reply]]] = {
     "PING": (0, ping),
     "ALTA": (1, alta),

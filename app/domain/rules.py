@@ -1,32 +1,59 @@
-"""Version-2 rules (Incident FR-0153) approved by the researcher as `supuesto`.
+"""Version-2 business rules (values from reports/handoff_implementation.md).
 
-These are the ONLY places where v2 intentionally differs from the v1 examples.
-They are NOT confirmed changes; they are the simplest defaults consistent with
-the v2 observations of experiment sequence `v2-s1` (ids 1-21). Do not widen
-them without new evidence.
-
-S-1  CONSULTA returns `saldo` as a STRING with two decimals = balance / 100.
-     v2 ids 6, 9, 12, 20 ("0.00", "400.00", "2100.00", "407.00"); v1 returned
-     the integer (EX-5, 8, 11, 19). Unknown: negatives, huge values, and whether
-     the unit of the INPUT amounts also changed. Balances stay integers.
-S-2  TRANSFER with amount >= 100000 -> 422 E506. v2 ids 10 (120000) and 11
-     (100000) are rejected; v1 accepted 100000 (EX-10). The true v2 threshold and
-     semantics (per-operation, inclusive/exclusive, cumulative, unit) are UNKNOWN;
-     100000 is only the simplest value consistent with both observations.
-     DEPOSITO is not limited (v2 id 7: 250000 accepted).
-S-3  ANULA on an operation that does not exist -> 404 E402 "operación
-     inexistente" (v2 ids 14, 15). Implemented in services/commands.py (anula).
+* TRANSFER limit: amount > 50000 -> E506; 50000 passes, 50001 fails (ids 2792,
+  2786). Per operation, not cumulative (ids 42-45). DEPOSITO has no limit.
+* Amounts are integer CENTS: ^[1-9][0-9]{0,9}$ (1-10 digits, no sign, no
+  decimals, no leading zero, not 0). Anything else -> E303 (ids 983-1394,
+  1814 ok at 10 digits, 2776 E303 at 11).
+* CONSULTA `saldo` is a string "X.YY" = balance/100, negatives "-400.00"
+  (ids 2411, 2491), no thousands separator (id 1830).
+* Blocking: 3 consecutive TRANSFER failures (E506/E507) as source -> E510.
+* E301 suggestion: nearest known command within Levenshtein distance <= 2.
 """
+import re
 
-TRANSFER_LIMIT = 100_000  # S-2 (supuesto): amounts >= this are rejected with E506
+TRANSFER_LIMIT = 50_000
+BLOCK_AFTER_FAILURES = 3
+
+_AMOUNT_RE = re.compile(r"[1-9][0-9]{0,9}")
+
+
+def parse_amount(text: str) -> int | None:
+    """Valid amount in cents, or None (-> E303)."""
+    return int(text) if _AMOUNT_RE.fullmatch(text) else None
 
 
 def transfer_exceeds_limit(amount: int) -> bool:
-    return amount >= TRANSFER_LIMIT
+    return amount > TRANSFER_LIMIT
 
 
 def format_saldo(balance: int) -> str:
-    """S-1 (supuesto): integer balance -> 'X.YY' string (balance / 100), no floats."""
+    """Integer cents -> 'X.YY' (no floats, no separators, leading '-' if negative)."""
     sign = "-" if balance < 0 else ""
     whole, cents = divmod(abs(balance), 100)
     return f"{sign}{whole}.{cents:02d}"
+
+
+def levenshtein(a: str, b: str) -> int:
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = cur
+    return prev[-1]
+
+
+SUGGESTION_MAX_DISTANCE = 2
+
+
+def suggest_command(command: str, known: list[str]) -> str | None:
+    """Closest known command (case-insensitive) within distance <= 2.
+    Ties: first in `known` order (supuesto, ties never probed)."""
+    upper = command.upper()
+    best, best_d = None, SUGGESTION_MAX_DISTANCE + 1
+    for name in known:
+        d = levenshtein(upper, name)
+        if d < best_d:
+            best, best_d = name, d
+    return best

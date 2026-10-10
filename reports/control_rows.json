@@ -1,0 +1,369 @@
+{
+ "note": "Pairs (message minus trailing ;control, control) where original did NOT answer E202 => control valid. Invariant to case, whitespace and non-alphanumerics. PING is never checked. Source: experimentos.jsonl ids 1-2821",
+ "rows": [
+  {
+   "message_without_control": "ALTA;Lucia",
+   "control": 82
+  },
+  {
+   "message_without_control": "ALTA;Mateo",
+   "control": 3
+  },
+  {
+   "message_without_control": "CONSULTA;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;250000",
+   "control": 86
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;40000",
+   "control": 86
+  },
+  {
+   "message_without_control": "CONSULTA;AC-0002",
+   "control": 11
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;120000",
+   "control": 55
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;100000",
+   "control": 12
+  },
+  {
+   "message_without_control": "CONSULTa;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "SALDOS;AC-0001",
+   "control": 38
+  },
+  {
+   "message_without_control": "ANULA;OP-0003",
+   "control": 66
+  },
+  {
+   "message_without_control": "CONSULTA;AC-0009",
+   "control": 87
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0002;AC-0001;50000",
+   "control": 23
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0002;700",
+   "control": 35
+  },
+  {
+   "message_without_control": "ALTA;Lucia;Gomez",
+   "control": 11
+  },
+  {
+   "message_without_control": "ping",
+   "control": 64
+  },
+  {
+   "message_without_control": "Ping",
+   "control": 64
+  },
+  {
+   "message_without_control": " PING",
+   "control": 64
+  },
+  {
+   "message_without_control": "CONSULTA;ac-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA;AC-0001 ",
+   "control": 14
+  },
+  {
+   "message_without_control": "consulta;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "P ING",
+   "control": 64
+  },
+  {
+   "message_without_control": "  PING",
+   "control": 64
+  },
+  {
+   "message_without_control": "\tPING",
+   "control": 64
+  },
+  {
+   "message_without_control": " CONSULTA;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA ;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULT A;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CON SULTA;AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA; AC-0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "ALTA;Lu cia",
+   "control": 82
+  },
+  {
+   "message_without_control": "ALTA;Lucia ",
+   "control": 82
+  },
+  {
+   "message_without_control": "ALTA;lucia",
+   "control": 82
+  },
+  {
+   "message_without_control": "ALTA;LUCIA",
+   "control": 82
+  },
+  {
+   "message_without_control": "CONSULTA;AC0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA;AC.0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA;A-C-0-0-0-1",
+   "control": 14
+  },
+  {
+   "message_without_control": "CONSULTA;AC_0001",
+   "control": 14
+  },
+  {
+   "message_without_control": "PNG",
+   "control": 60
+  },
+  {
+   "message_without_control": "CONSULTAS;AC-0001",
+   "control": 82
+  },
+  {
+   "message_without_control": "TRANSFERIR;AC-0001",
+   "control": 61
+  },
+  {
+   "message_without_control": "ALTAXY",
+   "control": 78
+  },
+  {
+   "message_without_control": "ALTAXYZ",
+   "control": 57
+  },
+  {
+   "message_without_control": "PONG",
+   "control": 98
+  },
+  {
+   "message_without_control": "ANUL",
+   "control": 93
+  },
+  {
+   "message_without_control": "DEPOSITOX",
+   "control": 98
+  },
+  {
+   "message_without_control": "TRANSF",
+   "control": 4
+  },
+  {
+   "message_without_control": "CONS",
+   "control": 43
+  },
+  {
+   "message_without_control": "XYZ",
+   "control": 20
+  },
+  {
+   "message_without_control": "SALDO",
+   "control": 38
+  },
+  {
+   "message_without_control": "CONSULTA;AC-0003",
+   "control": 8
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;0",
+   "control": 31
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;-5",
+   "control": 16
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;1.5",
+   "control": 62
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;007",
+   "control": 70
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;abc",
+   "control": 13
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;99999999999999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;1",
+   "control": 28
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0001;100",
+   "control": 17
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;0",
+   "control": 44
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;abc",
+   "control": 52
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;1.5",
+   "control": 95
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0009;abc",
+   "control": 69
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0001;abc",
+   "control": 45
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0009;AC-0009;100",
+   "control": 33
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0009;abc",
+   "control": 4
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0009;AC-0001;abc",
+   "control": 5
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0009;AC-0001;100",
+   "control": 74
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0009;100",
+   "control": 73
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0001;100000",
+   "control": 93
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;9999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;999999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;999999999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;9999999999999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;99999",
+   "control": 24
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;99998",
+   "control": 27
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;75000",
+   "control": 40
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;50001",
+   "control": 56
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0001;AC-0002;100001",
+   "control": 9
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0002;250000",
+   "control": 5
+  },
+  {
+   "message_without_control": "TRANSFER;AC-0002;AC-0001;40000",
+   "control": 50
+  },
+  {
+   "message_without_control": "ANULA;OP-0001",
+   "control": 72
+  },
+  {
+   "message_without_control": "ANULA;OP-0002",
+   "control": 69
+  },
+  {
+   "message_without_control": "ANULA;OP-9999",
+   "control": 51
+  },
+  {
+   "message_without_control": "ANULA;XYZ",
+   "control": 44
+  },
+  {
+   "message_without_control": "ANULA;AC-0001",
+   "control": 59
+  },
+  {
+   "message_without_control": "ANULA;op-0001",
+   "control": 72
+  },
+  {
+   "message_without_control": "ANULA;OP-0001;x",
+   "control": 45
+  },
+  {
+   "message_without_control": "DEPOSITO;AC-0001;99999999999",
+   "control": 4
+  },
+  {
+   "message_without_control": "ALTA;Lucia------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------",
+   "control": 82
+  },
+  {
+   "message_without_control": "ALTA;Lucia                                                                      ",
+   "control": 82
+  }
+ ]
+}

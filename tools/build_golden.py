@@ -31,6 +31,15 @@ DEFAULT_TRACE = REPO_ROOT / "experimentos_trace.jsonl"
 DEFAULT_EXAMPLES = REPO_ROOT / "pruebas" / "ejemplos.jsonl"
 SCHEMA = "golden-sequence/1"
 
+# Sequences recorded WITHOUT a leading reset that are nevertheless admitted, because every
+# step is state-independent (routing, auth, body parsing, PING). Justification per seq:
+STATELESS_SEQUENCES = {
+    "h003-entrada": "ids 64-92: /health, auth failures, unknown routes/methods, malformed bodies, PING; "
+                     "no step reads or writes accounts/operations (the two /__reset calls are unauthorized)",
+    "h003-limits2": "ids 2804-2821: PING bodies of increasing size (body-size limit); state-independent",
+}
+PLAIN_RESET_REQUEST = {"method": "POST", "path": "/__reset"}
+
 
 def read_jsonl(path: Path) -> list[dict]:
     if not path.exists():
@@ -74,8 +83,9 @@ def build_v2(log_rows: list[dict], trace_rows: list[dict]) -> tuple[dict[str, di
                 stopped = True
             if stopped:
                 break   # later steps would depend on a request that is not usable
-            is_reset = t["path"] == "/__reset"
-            if not steps and not is_reset:
+            is_reset = t["method"] == "POST" and t["path"] == "/__reset"
+            is_msg = t["method"] == "POST" and t["path"] == "/msg"
+            if not steps and not is_reset and seq not in STATELESS_SEQUENCES:
                 report["skipped"].append({"seq": seq, "reason": "sequence does not start with a reset"})
                 steps = []
                 break
@@ -83,9 +93,11 @@ def build_v2(log_rows: list[dict], trace_rows: list[dict]) -> tuple[dict[str, di
                 hyps.append(r["hipotesis"])
             steps.append({
                 "step": len(steps),
-                "kind": "reset" if is_reset else "msg",
+                "kind": "reset" if is_reset else "msg" if is_msg else "http",
                 "method": t["method"], "path": t["path"],
-                "request": None if is_reset else r["request"],
+                # plain resets keep request=None (schema of the first fixtures); resets with
+                # extra info (e.g. auth variants) keep the logged request record
+                "request": None if (is_reset and r["request"] == PLAIN_RESET_REQUEST) else r["request"],
                 "expected": expected_from(r["status"], r["response"], t.get("response_raw"),
                                           t.get("response_is_json")),
                 "source_experiment_id": r["id"],
@@ -103,6 +115,8 @@ def build_v2(log_rows: list[dict], trace_rows: list[dict]) -> tuple[dict[str, di
                 "hipotesis": hyps,
                 "experiment_ids": [s["source_experiment_id"] for s in steps],
                 "excluded": excluded,
+                **({"stateless_without_reset": STATELESS_SEQUENCES[seq]}
+                   if steps[0]["kind"] != "reset" else {}),
             },
             "steps": steps,
         }

@@ -140,7 +140,10 @@ def load_sequences(suite: str) -> list[dict]:
 def command_of(step: dict) -> str:
     if step["kind"] == "reset":
         return "__reset"
-    m = (step.get("request") or {}).get("m")
+    if step["kind"] == "http":
+        return f"{step.get('method')} {step.get('path')}"
+    req = step.get("request") or {}
+    m = req.get("m") if isinstance(req, dict) else None
     if not isinstance(m, str):
         return "<sin m>"
     return m.split(";", 1)[0].upper()
@@ -197,6 +200,38 @@ def encode_body(body: dict) -> bytes:
     return json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
+BAD_LOCAL_TOKEN = "invalid-probe-token"  # mirrors tools/probe.py auth="bad"
+
+
+def _body_bytes(body: Any) -> bytes | None:
+    if body is None:
+        return None
+    if isinstance(body, dict) and set(body) == {"raw"} and isinstance(body["raw"], str):
+        return body["raw"].encode("utf-8")          # exact raw text that was sent
+    return encode_body(body)
+
+
+def http_of_step(st: dict) -> tuple[str, str, str, bytes | None]:
+    """(method, path, auth, body) to replay a recorded step.
+
+    Request-record conventions (tools/replay_original.py, tools/probe.py):
+      * reset with request None                   -> authorized POST /__reset, no body
+      * {"method","path","auth",["body"]}         -> non-ok auth ("none" | "bad")
+      * non-POST-/msg step: {"method","path",["body"]}
+      * POST /msg: {"raw": text} = raw body text; anything else = the JSON body itself
+    """
+    method = st.get("method", "POST")
+    path = st.get("path", "/__reset" if st["kind"] == "reset" else "/msg")
+    req = st.get("request")
+    if req is None:
+        return method, path, "ok", None
+    meta = isinstance(req, dict) and "method" in req and "path" in req and (
+        "auth" in req or (method, path) != ("POST", "/msg"))
+    if meta:
+        return req["method"], req["path"], req.get("auth", "ok"), _body_bytes(req.get("body"))
+    return method, path, "ok", _body_bytes(req)
+
+
 def run_sequence(client, seq: dict) -> SequenceResult:
     auth = {"Authorization": f"Bearer {LOCAL_TEST_TOKEN}"}
     result = SequenceResult(seq["sequence_id"], seq["version"])
@@ -204,12 +239,13 @@ def run_sequence(client, seq: dict) -> SequenceResult:
     # is not a recorded reset.
     client.post("/__reset", headers=auth)
     for st in seq["steps"]:
+        method, path, auth_kind, content = http_of_step(st)
+        headers = ({} if auth_kind == "none" else
+                   {"Authorization": f"Bearer {BAD_LOCAL_TOKEN}"} if auth_kind == "bad" else dict(auth))
+        if content is not None:
+            headers["Content-Type"] = "application/json"
         t0 = time.monotonic()
-        if st["kind"] == "reset":
-            resp = client.post("/__reset", headers=auth)
-        else:
-            resp = client.post("/msg", content=encode_body(st["request"]),
-                               headers={**auth, "Content-Type": "application/json"})
+        resp = client.request(method, path, content=content, headers=headers)
         elapsed = time.monotonic() - t0
         raw = resp.content.decode("utf-8", errors="backslashreplace")
         expected = st.get("expected")

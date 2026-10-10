@@ -1,0 +1,30 @@
+{
+  "suite": "v2",
+  "note": "PASS/FAIL state per compared step at the last accepted run. Used only to classify failures; expectations live in the fixtures and are never edited.",
+  "recorded_utc": "2026-10-10T22:03:49+00:00",
+  "steps": {
+    "v2-s1": {
+      "0": "PASS",
+      "1": "PASS",
+      "2": "FAIL",
+      "3": "FAIL",
+      "4": "FAIL",
+      "5": "PASS",
+      "6": "PASS",
+      "7": "PASS",
+      "8": "PASS",
+      "9": "PASS",
+      "10": "PASS",
+      "11": "PASS",
+      "12": "PASS",
+      "13": "PASS",
+      "14": "PASS",
+      "15": "PASS",
+      "16": "PASS",
+      "17": "PASS",
+      "18": "PASS",
+      "19": "PASS",
+      "20": "PASS"
+    }
+  }
+}

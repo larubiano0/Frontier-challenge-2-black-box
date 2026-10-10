@@ -2,122 +2,162 @@
 
 > **Living document.** Pi agents may update this file after meaningful progress and at every handoff. Do not edit `Prompt.md`, `Implement.md`, or `Plan.md`. Keep this document short and evidence-linked; raw request/response records belong in `experimentos.jsonl`.
 
-_Last updated: 2026-10-10 ~15:30 Bogotá (16:30 EDT local clock). Deadline 20:00 Bogotá → ≈4.5 h remaining at time of writing._
+_Last updated: 2026-10-10 ≈17:05 Bogotá (18:05 EDT local clock). Deadline 20:00 Bogotá → ≈2 h 55 min remaining._
 
 ## 1. Current status
 
-- **Mode:** `PROPOSE` (read-only; no original-API calls). Bootstrap/orientation session completed.
-- **Phase:** M0 (bootstrap) — repository inspected; nothing built yet.
-- **Current approved hypothesis:** None.
-- **Current experimental agent request cap:** Not assigned.
-- **Original API calls recorded by this workflow:** 0. Verified: `experimentos.jsonl` does not exist; no script in the repo can call the original.
-- **Remaining daily original-request budget per token:** Unknown (limit is 8,000/day and 10/s per token; the researcher's actual consumption so far is not known to this workflow). Number of tokens available to the team: unknown.
-- **Tokens/credentials:** No `FRONTIER_TOKEN` or `ORIGINAL_BEARER_TOKEN` found in the agent's environment. No token files in the repo. (`.env` is git-ignored.) Treated as **not available**.
-- **Replacement implementation:** None. No code, no `requirements.txt`, no tests, no Railway config (`Procfile`/`railway.json`/`Dockerfile`).
-- **Deployment URL / status:** None. Railway CLI not found on the machine (`which railway` empty); deployment path not yet established.
-- **Specification (`specification.md`):** Not created.
-- **Last verified current-version observation:** None from this workflow.
+- **Mode at handoff:** `HANDOFF`. Session 1 ran `BUILD` tooling + `INVESTIGATE H-000`. Session 2 ran `BUILD` only (implemented the researcher-approved rules S-1…S-3 + minimal scaffolding); **0 requests were sent to the original in session 2**.
+- **Phase:** M0 ✔ · M1b ✔ · M1 ✔ (runnable local replacement) · M3b **partial**: S-1…S-3 implemented as `supuesto` plus v1-derived scaffolding; control value check (E202) **not implemented** (algorithm unknown). Not deployed.
+- **Approved hypothesis:** H-000 only — *executed and closed*. **No other hypothesis is approved.** Nothing further may be sent to the original without a new approval.
+- **Token handling:** `ORIGINAL_BEARER_TOKEN` was read only via `os.environ`. **Confirmation: no token was printed, logged or stored.** Verified by scanning every file in the repo (excluding `.venv`/`.git`) for the token value → 0 hits (including `experimentos.jsonl`, `experimentos_trace.jsonl`, the counter file, fixtures, reports and this file). `FRONTIER_TOKEN` was not used against the original. The runner/pytest use a dummy local token.
+- **Deployment:** none yet. **Specification (`specification.md`):** not created.
 
-### Repository inventory (inspected)
+## 2. Request budget (H-000) — unchanged in session 2
 
-| Path | State |
+| Item | Value |
 | --- | --- |
-| `README.md` | Organizers' contract (git-tracked). |
-| `Prompt.md`, `Implement.md`, `Plan.md` | Immutable instructions (untracked in git, unmodified by me). |
-| `Documentation.md` | This file (untracked). |
-| `pruebas/ejemplos.jsonl` | 20 baseline examples, one ordered sequence (`seq: "ejemplos"`), morning version. |
-| `.gitignore`, `.gitattributes` | Standard Python ignore; `.env`/`.venv` ignored. |
-| _(absent)_ | App code, tests, `experimentos.jsonl`, `specification.md`, deploy config. |
+| Approved cap (resets included) | **25** (1 reset + 20 `/msg` + ≤4 reserve) |
+| **Used** | **21** = 1 `POST /__reset` + 20 `POST /msg` |
+| **Remaining of the H-000 cap** | **4 (unused reserve; not to be spent — H-000 is closed, any further call needs a new approval)** |
+| Experiment IDs | **1–21**, `seq` = `v2-s1` |
+| Rate used | ≈4 req/s (limit 10/s); latency 16–72 ms per request |
+| Infra rate-limit events / 401 / 403 / connectivity errors | 0 / 0 / 0 / 0 |
+| Per-token counter (tool-observed, `tools/original_request_counter.json`, key = env-var name) | day_count = 21, lifetime = 21 of 8,000/day |
+| True daily consumption of the researcher's token | **Unknown** (earlier use outside this tool is not measurable here) |
 
-Local toolchain: Python 3.14.7. `fastapi`, `pytest`, `httpx` are **not installed** (`import` fails); `uvicorn`/`requests` not checked individually (not shown by `pip3 list`). Python 3.14 compatibility with the FastAPI/pydantic stack must be checked when installing (use a venv; fall back to an older interpreter if wheels are missing).
+ID ↔ example mapping: `id 1` = `POST /__reset`; `id k` (k = 2…21) = example `n = k−1` of `pruebas/ejemplos.jsonl`, same order, one sequence after the reset.
 
-## 2. Known inputs (not new experimental evidence)
+## 3. Evidence classification
 
-- Organizers' `README.md`: challenge contract, endpoints, rules, deliverables, evaluation.
-- `pruebas/ejemplos.jsonl`: 20 requests, one sequence after reset, morning version. **Not** an entry in `experimentos.jsonl`; cannot be cited as log evidence unless replayed and recorded by us. Cite it as `EX-n` (line `n`) in this file only.
-- Evaluation (README): 100 hidden tests (40 single / 45 of 2–5 / 15 of 6–12 steps), each starts with `/__reset`; pass = every compared step has identical status and body (JSON compared key-order-insensitively with exact scalars/types; non-JSON compared character-for-character); 5 s per step; single process; replacement must never call the original (set value 0 otherwise).
-- The spec is judged against the full list of service behaviors; each behavior needs a cited log `id`; **false claims subtract**.
-
-### Example-derived observations (`EX-n`; descriptive only, unverified against the current service)
-
-These are read straight off `pruebas/ejemplos.jsonl` (morning version). They are **leads for hypotheses**, not findings; none is `confirmado`, and none may enter the spec without log evidence.
-
-| Ref | Observation in the examples |
+| Class | Content |
 | --- | --- |
-| EX-1 | `PING;64` → 200 `{"pong":true}`. |
-| EX-2,3 | `ALTA;Lucia;83` → 400 `E202 "control inválido"`; identical body with control `82` → 201 `{"cuentaId":"AC-0001"}`. So the control depends on message content. Failed ALTA did not consume an account ID. |
-| EX-4 | `ALTA;Mateo;3` → 201 `AC-0002`. A control without zero padding (`3`) is accepted. |
-| EX-17,18 | Control `5X` → 400 `E201 "control mal formado"`; same body with `35` → 200 (`E201` = non-numeric format, `E202` = numeric but wrong). |
-| EX-5,11 | `CONSULTA;AC-0001;14` and `CONSULTa;AC-0001;14` both succeed with the same control → command token appears case-insensitive, and the control either ignores the command's case or doesn't cover it. |
-| EX-5,8,19 | `CONSULTA` → 200 `{"cuenta_id":..., "saldo": <int>}` (key `cuenta_id`, whereas ALTA uses `cuentaId`). |
-| EX-6,7,10,18 | `DEPOSITO`/`TRANSFER` success → 200 `{"status":"recieved","operacionId":"OP-000n"}` (note misspelling). Operation IDs increment only on success (failed EX-9/16 did not consume an ID). Balance reflected on the very next CONSULTA (EX-8). |
-| EX-9,10 | `TRANSFER … 120000` → 422 `E506 "límite excedido"` although the source balance (210000) was sufficient; `100000` succeeds. A limit exists somewhere in (100000, 120000]; whether it is per-operation, cumulative, or per-day is unknown. DEPOSITO 250000 (EX-6) was accepted, so deposits are not under the same limit. |
-| EX-13,14 | `ANULA;OP-0003` → 200 `{"ok":true,"anulada":"OP-0003"}`; repeat → 200 `{"ok":false,"motivo":"ya anulada"}` (business failure is HTTP 200). |
-| EX-16,19 | After cancelling OP-0003 (a 100000 transfer), `TRANSFER AC-0002→AC-0001 50000` → 422 `E507 "saldo insuficiente"` and AC-0002's later balance is 40700 (=40000+700). Consistent with **ANULA reversing the transfer's balance effect**. Inferred only. |
-| EX-15 | `CONSULTA;AC-0009` → 404 `E401 "cuenta inexistente"`. |
-| EX-12 | `SALDOS;…` → 400 `E301` with message **`"comando desconocido "` (trailing space)**. Preserve byte-exact. |
-| EX-20 | `ALTA;Lucia;Gomez;11` → 400 `E302 "aridad inválida"`. Unknown whether control (`11`) was valid → precedence arity vs. control is **undetermined** from the examples. |
-| IDs | Accounts `AC-%04d`, operations `OP-%04d`, sequential from 1 after reset; separate counters. |
+| **Historical v1** | `pruebas/ejemplos.jsonl` (EX-1…EX-20; morning version; organizer-supplied; **not** in `experimentos.jsonl`). Kept in `tests/golden/v1_historical/ejemplos.json`; never enforced as current. |
+| **Observed v2** | `experimentos.jsonl` ids **1–21** (single observation each, `seq v2-s1`). In `tests/golden/v2/v2-s1.json`. Supplementary provenance (raw body, headers of interest, version=2, eligibility): `experimentos_trace.jsonl`. |
+| **Confirmed unchanged** | **None.** 12 of the 20 steps gave a v2 response equal to v1, but each was seen once in one sequence → "observed v2 = v1", not yet `confirmado`. |
+| **Confirmed changed** | **None.** Only *candidates* (§4). |
+| **Unknown version status** | Everything not exercised: control algorithm and range, control on PING/CONSULTA, arity/precedence, amount parsing, the `E506` threshold semantics, ANULA on an existing operation in v2, auth failures, routes/methods, malformed bodies, `/health` body, … |
 
-Control-field algorithm: **unknown**. Two naive offline candidates (byte-sum of the body before the last `;` mod 100, with and without the trailing `;`) do not reproduce the example controls. No further offline fitting was done (would amount to starting hypothesis work without approval). Whether controls on `PING`, `CONSULTA`, etc. are even validated, and whether the control has a fixed range, is unknown.
+### v2-only observations (single observations; no v1 counterpart)
+- `POST /__reset` → 200 `{"ok":true}` (id 1), `Content-Type: application/json; charset=utf-8`, **no `X-Req` header** (→ `x_req: null`, flagged in the log).
+- `X-Req` on `/msg` responses: 1, 2, …, 20 (ids 2–21), i.e. +1 per `/msg` since the reset (descriptive only).
+- New error seen in v2: `404 {"error":"E402","mensaje":"operación inexistente"}` (ids 14, 15). v1 examples never exercised this code.
 
-## 3. Hypothesis backlog and approvals
+## 4. v1 vs v2, step by step (candidate differences — descriptive only)
 
-_No proposer output or approvals recorded yet._
+Generated by `python -m tools.compare_v1_v2` (also saved in `reports/v1_vs_v2.md`). 20 steps: **12 equal, 8 different**. Rows marked *candidata* are **not** declared changes: a difference may be a consequence of another one and the evidence is insufficient (one sequence, no counter-probes).
 
-Format when available: `ID | Hypothesis | Alternatives / counterexamples | Priority | Evidence IDs | Confidence | Researcher decision | Approved cap | Status`.
+| n | request | respuesta v1 (histórica) | respuesta v2 (observada, id) | ¿igual? |
+|---|---|---|---|---|
+| 1 | `PING;64` | 200 `{"pong":true}` | 200 `{"pong":true}` (2) | sí |
+| 2 | `ALTA;Lucia;83` | 400 `{"error":"E202","mensaje":"control inválido"}` | idéntica (3) | sí |
+| 3 | `ALTA;Lucia;82` | 201 `{"cuentaId":"AC-0001"}` | idéntica (4) | sí |
+| 4 | `ALTA;Mateo;3` | 201 `{"cuentaId":"AC-0002"}` | idéntica (5) | sí |
+| 5 | `CONSULTA;AC-0001;14` | 200 `{"cuenta_id":"AC-0001","saldo":0}` | 200 `{"cuenta_id":"AC-0001","saldo":"0.00"}` (6) | **NO · candidata** (`saldo` int → str) |
+| 6 | `DEPOSITO;AC-0001;250000;86` | 200 `{"status":"recieved","operacionId":"OP-0001"}` | idéntica (7) | sí |
+| 7 | `TRANSFER;AC-0001;AC-0002;40000;86` | 200 `{"status":"recieved","operacionId":"OP-0002"}` | idéntica (8) | sí |
+| 8 | `CONSULTA;AC-0002;11` | 200 `…"saldo":40000}` | 200 `…"saldo":"400.00"}` (9) | **NO · candidata** (`saldo` int → str) |
+| 9 | `TRANSFER;AC-0001;AC-0002;120000;55` | 422 `{"error":"E506","mensaje":"límite excedido"}` | idéntica (10) | sí |
+| 10 | `TRANSFER;AC-0001;AC-0002;100000;12` | 200 `{"status":"recieved","operacionId":"OP-0003"}` | **422 `{"error":"E506","mensaje":"límite excedido"}`** (11) | **NO · candidata** (status 200→422, cuerpo distinto) |
+| 11 | `CONSULTa;AC-0001;14` | 200 `…"saldo":110000}` | 200 `…"saldo":"2100.00"}` (12) | **NO · candidata** (tipo de `saldo`; además el valor numérico es otro) |
+| 12 | `SALDOS;AC-0001;38` | 400 `{"error":"E301","mensaje":"comando desconocido "}` | idéntica (13) | sí |
+| 13 | `ANULA;OP-0003;66` | 200 `{"ok":true,"anulada":"OP-0003"}` | **404 `{"error":"E402","mensaje":"operación inexistente"}`** (14) | **NO · candidata** |
+| 14 | `ANULA;OP-0003;66` | 200 `{"ok":false,"motivo":"ya anulada"}` | **404 `{"error":"E402","mensaje":"operación inexistente"}`** (15) | **NO · candidata** |
+| 15 | `CONSULTA;AC-0009;87` | 404 `{"error":"E401","mensaje":"cuenta inexistente"}` | idéntica (16) | sí |
+| 16 | `TRANSFER;AC-0002;AC-0001;50000;23` | 422 `{"error":"E507","mensaje":"saldo insuficiente"}` | idéntica (17) | sí |
+| 17 | `DEPOSITO;AC-0002;700;5X` | 400 `{"error":"E201","mensaje":"control mal formado"}` | idéntica (18) | sí |
+| 18 | `DEPOSITO;AC-0002;700;35` | 200 `{"status":"recieved","operacionId":"OP-0004"}` | 200 `…"operacionId":"OP-0003"}` (19) | **NO · candidata** (OP-0004 → OP-0003) |
+| 19 | `CONSULTA;AC-0002;11` | 200 `…"saldo":40700}` | 200 `…"saldo":"407.00"}` (20) | **NO · candidata** (`saldo` int → str) |
+| 20 | `ALTA;Lucia;Gomez;11` | 400 `{"error":"E302","mensaje":"aridad inválida"}` | idéntica (21) | sí |
 
-**Candidate areas for the first `PROPOSE` pass (not yet hypotheses; no approval implied):** (a) control-field algorithm and range; (b) error-precedence (control vs. arity vs. unknown command vs. missing account vs. limit vs. balance); (c) transport/protocol surface: auth failures, malformed JSON, missing/non-string `m`, wrong methods, unknown routes, body size; (d) the `E506` limit's semantics; (e) `ANULA` semantics across operation types (deposit, transfer, unknown/foreign OP, cancel-then-rebalance); (f) numeric/ID parsing (amounts: negative, zero, decimals, leading zeros, huge; IDs: case, padding); (g) reset semantics and counters; (h) what changed since the morning version.
+### Candidate differences (grouped for discussion; NOT confirmed, NOT counted as "the 3 changes")
+- **D-A — forma de `saldo` en CONSULTA** (n = 5, 8, 11, 19; ids 6, 9, 12, 20): int → string con 2 decimales. Los 4 valores son numéricamente coherentes con *entero v1 ÷ 100* (0→`"0.00"`, 40000→`"400.00"`, 40700→`"407.00"`; el 2100.00 de n=11 corresponde a 210000 = 250000−40000, ver D-B). Desconocido: negativos, valores grandes, si cambió la unidad de los montos de entrada (DEPOSITO/TRANSFER) o solo la salida.
+- **D-B — TRANSFER de 100000** (n = 10; id 11): v1 aceptaba (OP-0003); v2 responde 422 `E506`. En v2 también se rechaza 120000 (id 10), como en v1. Explicaciones alternativas **sin probar**: umbral por operación más bajo; límite inclusivo (`>=`) en vez de exclusivo; límite acumulado/por cuenta (ya había 40000 transferidos); cambio de unidad entre montos y límite (ver D-A); precedencia distinta. Cualquiera sirve para el hecho observado.
+- **D-C — posibles consecuencias de D-B** (no verificado; sin contraejemplo): n = 11 (saldo AC-0001 = `2100.00` ≙ 210000, es decir, como si OP-0003 no se hubiera ejecutado), n = 13/14 (`ANULA;OP-0003` → 404 `E402`: en v2 **OP-0003 no existía** porque n=10 fue rechazada), n = 18 (OP-0004 → OP-0003: una operación rechazada no consume ID; v1 ya lo mostraba en EX-9/16). **No se puede separar** "ANULA cambió" de "ANULA se comporta igual y solo faltó la operación": ANULA sobre una operación existente nunca se observó en v2.
+- **Tercer cambio:** no identificado. Puede estar dentro de lo ya visto (p. ej. D-A y D-B pueden ser dos cambios y D-C consecuencia) o en comportamiento **no ejercitado** por esta secuencia. No se infiere.
 
-## 4. Confirmed/probable findings
+## 5. Hypothesis log
 
-_No original-API evidence independently collected by this workflow yet._ (See Section 2 for example-derived leads only.)
+| ID | Hypothesis | Evidence IDs | Result | Status |
+| --- | --- | --- | --- | --- |
+| H-000 | Reproducir los 20 requests de `ejemplos.jsonl` como una secuencia tras reset contra el original v2 → línea base v2 y diferencias con v1 | 1–21 | Línea base obtenida; 12/20 pasos iguales a v1, 8 distintos (candidatas D-A…D-C) | **Cerrada** |
 
-For each finding record: `Rule ID | Precise claim | Original experiment IDs | Confidence (confirmado/probable/supuesto) | Last observed time/version | Counterexamples`.
+No other hypothesis is approved. No `confirmado` claim exists.
 
-## 5. Experiments and request accounting
+## 6. Implementation, tools and regression metrics
 
-- **Experiment log location:** `experimentos.jsonl` (to be created on the first authorized original request; **not present now**).
-- **Token-by-token counts and limits:** None recorded. Count **all** original HTTP calls, including reset and health requests.
-- **Active sequences / token locks:** None.
-- **Infrastructure rate-limit events:** None.
-- **Original calls used by this session:** 0.
+### Tooling (session 1, outside `app/`; unchanged)
+`tools/replay_original.py` (experiments only; dry-run by default; counter, ≤10 req/s using ~4, 5 s timeout, stops on infra rate-limit/401/403/429/connectivity/non-2xx reset) · `tools/build_golden.py` (log → `tests/golden/v2/`, examples → `tests/golden/v1_historical/`, extend-only) · `tools/golden_lib.py` + `tools/run_golden.py` (README comparison rules, in-process local app, network blocked, regression-vs-known classification via `tests/golden/baseline_v2.json`, now also reports steps that went FAIL→PASS) · `tools/compare_v1_v2.py` (§4 table). Log/trace/counter files: `experimentos.jsonl`, `experimentos_trace.jsonl`, `tools/original_request_counter.json`. Commands (repo root, `.venv`): `python -m tools.build_golden` · `python -m tools.run_golden [--suite v1_historical] [--update-baseline]` · `python -m pytest` · `python -m tools.compare_v1_v2`.
 
-Log batches here as: `time | hypothesis | agent | token alias | max calls | calls used | seq IDs | key results | handoff`.
+### Backend implemented in session 2 (`app/`)
+| File | Role |
+| --- | --- |
+| `app/protocol/parser.py` | `{"m": "..."}` → command / args / control (last `;` field is the control). Invalid JSON, missing/non-string `m`, or no `;` → `Unevidenced`. |
+| `app/domain/errors.py` | `ServiceError` + byte-exact E201, E301 (**trailing space**), E302, E401, E402, E506, E507 (each cites its evidence id); `Unevidenced`. |
+| `app/domain/rules.py` | **The three v2 rules** (S-1 `format_saldo`, S-2 `TRANSFER_LIMIT`/`transfer_exceeds_limit`; S-3 documented, enforced in `commands.anula`). |
+| `app/services/commands.py` | PING, ALTA, CONSULTA, DEPOSITO, TRANSFER, ANULA handlers; every line tagged `[v2]`, `[S-n]`, `[v1]`, `[default]` or `[?]`. |
+| `app/services/dispatcher.py` | Precedence: shape → control format (E201) → *(control value E202: missing)* → command (E301, case-insensitive) → arity (E302) → handler. |
+| `app/api/routes.py`, `app/core/auth.py`, `app/storage/*` | Unchanged (auth body, `/health` and `/__reset` bodies remain placeholders; `/__reset` `{"ok":true}` happens to equal observed id 1). |
 
-## 6. Implementation, tests, and deployment
+**The 3 approved rules (all `supuesto`; none is a confirmed change):**
+| Rule | Implemented behavior | Evidence | Where |
+| --- | --- | --- | --- |
+| S-1 | `CONSULTA` → `saldo` = string `balance/100` with 2 decimals (integer arithmetic; balances stay ints) | v2 ids 6, 9, 12, 20 | `rules.format_saldo`, `commands.consulta` |
+| S-2 | `TRANSFER` amount ≥ 100000 → 422 `E506 "límite excedido"` (checked after accounts exist, before balance); `DEPOSITO` unlimited | v2 ids 10, 11 (and 7 for DEPOSITO) | `rules.transfer_exceeds_limit`, `commands.transfer` |
+| S-3 | `ANULA` of a non-existent operation → 404 `E402 "operación inexistente"` | v2 ids 14, 15 | `commands.anula` |
 
-- **Code:** none. **Tests run:** none. **Deployed:** no.
-- Local run/test commands: not yet defined (no venv, no dependencies installed).
-- The 20-example fixture (`pruebas/ejemplos.jsonl`) is available to be replayed as ONE ordered sequence after reset once a baseline exists.
+**Scaffolding needed to reach the rules (all `supuesto`, from v1 or defaults):** ID formats `AC-%04d`/`OP-%04d` (counters consumed only on success; v2 ids 4, 5, 19); `recieved` body; ANULA of an existing op → `{"ok":true,"anulada":…}` + balance reversal, repeat → `{"ok":false,"motivo":"ya anulada"}` (**v1 only**, never observed in v2); command case-insensitivity (v2 id 12); control must be digits-only else E201 (v2 id 18). **Pure defaults:** order of checks (src, dst, amount, limit, balance), E401 for DEPOSITO/TRANSFER accounts, duplicate names allowed, exact-match account IDs. **No evidence and no default → explicit `501 {"error":"not_implemented"}` (this is NOT the original's behavior):** non-JSON/odd body, message without `;`, amounts that are not plain positive integers, empty ALTA name, TRANSFER to the same account, ANULA that cannot be reversed because the funds are gone.
 
-Track: files changed, runnable endpoints, comparison fixtures, exact passing/failing sequences, error categories, locally measured latency, deployed URL and live checks. Never report a test as passing unless it actually ran.
+### Regression metrics — suite v2 vs. current backend — run 2026-10-10 18:04 EDT (session 2)
+| Metric | Session 1 (skeleton) | **Now** |
+| --- | --- | --- |
+| Golden sequences | 1 | **1** (0 passing, 1 failing) |
+| Recorded requests | 21 | **21** (1 reset + 20 `/msg`) |
+| Request Agreement Rate | 4.8 % (1/21) · `/msg` 0/20 | **85.7 % (18/21)** · `/msg` **85.0 % (17/20)** |
+| Sequence Agreement Rate | 0 % | **0 % (0/1)** |
+| Steps FAIL→PASS vs. baseline | — | 17 (steps 1, 5–20) |
+| Newly introduced regressions | 0 | **0** |
+| Known mismatches | 20 | **3** (steps 2, 3, 4) |
+| First failing step | step 1 `PING` (501) | **step 2** `ALTA;Lucia;83` (src id 3): expected `400 {"error":"E202","mensaje":"control inválido"}`, actual `201 {"cuentaId":"AC-0001"}` |
+| Max step latency | ≈3 ms | <1 ms (limit 5 s) |
+| pytest | 41 ok / 1 fail | **62 passed, 1 failed** (`test_v2_sequence[v2-s1]`, expected) |
 
-## 7. Decisions, deviations, and incident watch
+**Why the sequence still fails:** only because of the missing E202. Step 2 wrongly creates `AC-0001`, so steps 3 and 4 return `AC-0002`/`AC-0003` instead of `AC-0001`/`AC-0002` (cascade, verified by inspecting the actual bodies). Everything else in v2-s1 — including every S-1/S-2/S-3 step (ids 6, 9, 11, 12, 14, 15, 20) — matches. Expectations and fixtures were **not** modified; only `baseline_v2.json` (PASS/FAIL state used for classification) was refreshed, and only because there were no regressions.
+Historical v1 suite (informational, **not** an expectation): 9/20 requests, 0/1 sequence; its 11 failures are the 8 candidate rows of §4 plus the 3 E202-cascade steps — i.e. the backend currently behaves like v2 where v2 was observed and like v1 elsewhere, as designed.
+Other local tests: `tests/test_rules_local.py` (21 locally generated tests of S-1…S-3 and the scaffolding; **not confirmed by the original**, labeled as such; includes a test documenting the E202 gap and one for the 501 placeholders). Real-server smoke test (uvicorn on localhost, dummy token): responses identical to the TestClient run.
 
-- **Fixed architecture:** Python/FastAPI modular monolith; dataclasses + in-memory state behind a storage boundary; SQLite only if justified.
-- **Research model:** proposer → researcher selects one hypothesis/budget → scoped experimental agent → evidence → differential tests → handoff.
-- **Service change status:** Unknown. The examples are from the morning; no change independently verified.
-- **Note for the researcher (2026-10-10):** The organizers' README says "No uses herramientas que hagan el trabajo por ti"; `Prompt.md` allows own scripts/fuzzers but forbids relying on an external black-box replication product. This workflow's agent-driven approach follows `Prompt.md`; the researcher should confirm it is acceptable under the official rules. Where they conflict, the README wins.
+## 7. Control value (E202) — offline analysis, no original requests
 
-## 8. Open questions / blockers
+Attempted to fit the control algorithm from the 19 usable examples (v1) using the v2 sequence as the same data. Searched: sums/weighted sums/polynomial hashes/XOR/CRC32/Adler over {raw, upper-cased, with/without `;`} for moduli 2…1000, then, for mod 97, linear position-weighted sums (from start and from end) with arbitrary scale and offset. **No model reproduced all rows.** Weak, unverified leads only:
+- The three `CONSULTA;AC-000d;c` points (d=1,2,9 → c=14, 11, 87) are consistent with arithmetic **mod 97** and a coefficient of −3 per unit of the last character (and `CONSULTa` = `CONSULTA` suggests case normalization or exclusion of the command). Only 3 points; could be coincidence.
+- `TRANSFER;AC-0001;AC-0002;120000;55` vs `…100000;12` also yields −3 per unit if the amount enters numerically, but the `DEPOSITO` pair breaks that simple model.
+- All observed controls are < 97 (max 87). `PING;64` and the E301/E302 rows may not be validated at all (unknown).
+**Conclusion: the algorithm is unknown.** Not implemented, no lookup table of known values was added (it would fake passing steps). Needs a dedicated hypothesis (`PROPOSE`) with controlled probes.
 
-- **Blocker for any probing:** no approved hypothesis, no request cap, and no token available in the environment (how/where will the researcher supply `ORIGINAL_BEARER_TOKEN` safely?).
-- Control/integrity algorithm (range, which fields it covers, case sensitivity, applicability per command).
-- Validation and error-precedence rules (control vs. arity vs. command vs. account vs. limit vs. balance).
-- Semantics of `E506` limit; full list of error codes (so far seen: E201, E202, E301, E302, E401, E506, E507).
-- `ANULA` scope (which operations, reversal rules, unknown IDs, authorization).
-- Transport behavior: auth failure body/status, malformed JSON, wrong methods, unknown routes, `/health` body, `/__reset` body.
-- What changed since the morning version, and when.
-- How many tokens does the team have, and how much daily budget has been consumed?
-- Railway access: project/account ready? Which Python version does Railway build use?
+## 8. Open questions / blockers (anotadas, NO probadas)
+
+- **Blocker for any further original probing:** no approved hypothesis/budget.
+- **Control/E202 algorithm** (§7) — the only reason v2-s1 does not pass; likely affects many hidden tests with invalid controls. Whether v2 changed it: unknown.
+- D-B: what exactly makes 100000 fail in v2 (threshold, inclusivity, cumulative, unit)? Does 99999 or a smaller amount pass? (S-2 uses ≥100000 as a default only.)
+- D-A: negatives/large/zero balances; whether input amounts are now cents.
+- ANULA on an existing operation in v2: still `{"ok":true,"anulada":…}` with reversal? repeat → "ya anulada"? (v2-s1 never created OP-0003.) Is `E402` new in v2? This is the main place where the third change could be hiding.
+- Real validation precedence (control format vs. command vs. arity vs. account vs. limit vs. balance) — all current order is a default. Does PING validate its control?
+- Behavior for malformed bodies, missing `m`, unknown routes/methods, auth failures, `/health` and `/__reset` bodies — still placeholders.
+- DEPOSITO/TRANSFER on unknown accounts (E401 assumed), amount parsing (0, negatives, decimals, leading zeros), duplicate names, same-account transfer.
+- The third change is unidentified.
+- README ambiguity: whether the evaluator compares the `/__reset` response; our reports show `/msg`-only rates separately.
+- Team token count; Railway access/Python version (carried over).
+- Note for the researcher: README says "No uses herramientas que hagan el trabajo por ti"; this work uses only self-written scripts; confirm acceptable (README wins in a conflict).
+- `RUN_BACKEND.md` (not editable by agents) is now stale: it still says `/msg` returns 501 and that the golden suite does not exist.
+
+### Clarification — "header ausente" (X-Req on `/__reset`)
+Not a problem with the service or with the code. The log format requires `x_req`, the value of the **`X-Req` response header**. In experiment **id 1** (`POST /__reset`) the original's response simply had **no `X-Req` header** (all 20 `/msg` responses did: 1…20). Per the rules I wrote `x_req: null` and flagged it in that line's `conclusion`. Headers are **not scored** by the evaluator, so the replacement does not need to emit `X-Req`; it is only a quirk to know about (and a hint that `X-Req` counts `/msg` calls since the last reset).
 
 ## 9. Next bounded action / handoff
 
-**Current mode:** `PROPOSE` (no original calls).
+**Current mode:** `HANDOFF`. Original requests used in total: 21 (H-000 only). Local state: backend with S-1…S-3 implemented (`supuesto`), golden v2 at 18/21 requests, 0 regressions, 3 known mismatches (all E202).
 
-**Recommended next single action (needs researcher go-ahead on scope only; no API use):** `BUILD` the M0/M1 skeleton locally — venv + dependencies, FastAPI app with `/health`, `/__reset`, `/msg`, in-memory store behind an interface, command-dispatch skeleton, and a pytest fixture replaying the 20 examples as one ordered sequence (expected to partly fail until rules are evidenced; failing steps will be marked as such). No original calls. Then run a full `PROPOSE` pass producing `H-001…` with request-cost estimates, and wait for the researcher to pick **one** hypothesis plus a numeric cap.
+**Recommended next single action:** run a `PROPOSE` pass (no original calls) to produce `H-001…` and ask the researcher to approve **one** with a request cap. Priority candidates: (a) the **control algorithm / E202** (largest impact on hidden tests, and what blocks `v2-s1` from passing), designed from the §7 leads; (b) `ANULA` on an *existing* operation in v2 and the `E506` threshold, to confirm or refute S-2/S-3 and look for the third change.
 
-**Inputs needed from the researcher before any `INVESTIGATE`:** chosen hypothesis, numeric request cap `N`, a token supplied via environment variable (`ORIGINAL_BEARER_TOKEN`), and today's consumed-request count per token.
+**Inputs needed from the researcher:** which hypothesis to investigate and its cap; today's true consumed-request count for the token (if known); whether the `501 not_implemented` placeholder is acceptable meanwhile or a different default is preferred for unevidenced inputs.
 
-**Before handing off:** update status, newly obtained facts with evidence IDs, failures and uncertainty, remaining token budgets, and one recommended next action.
+**Before the next handoff:** re-inspect ids 1–21 and the §4 table independently; run `python -m tools.run_golden` and `python -m pytest` after every backend change; never edit fixtures to make tests pass.

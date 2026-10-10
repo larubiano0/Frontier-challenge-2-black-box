@@ -1,0 +1,69 @@
+{
+  "suite": "v2",
+  "generated_utc": "2026-10-10T22:03:49+00:00",
+  "metrics": {
+    "sequences_total": 1,
+    "sequences_passing": 0,
+    "sequences_failing": 1,
+    "requests_total": 21,
+    "requests_passing": 18,
+    "request_agreement_rate": 0.8571428571428571,
+    "sequence_agreement_rate": 0.0,
+    "msg_requests_total": 20,
+    "msg_requests_passing": 17,
+    "msg_request_agreement_rate": 0.85,
+    "sequence_agreement_rate_msg_only": 0.0,
+    "per_command": {
+      "ALTA": {
+        "passing": 1,
+        "total": 4
+      },
+      "ANULA": {
+        "passing": 2,
+        "total": 2
+      },
+      "CONSULTA": {
+        "passing": 5,
+        "total": 5
+      },
+      "DEPOSITO": {
+        "passing": 3,
+        "total": 3
+      },
+      "PING": {
+        "passing": 1,
+        "total": 1
+      },
+      "SALDOS": {
+        "passing": 1,
+        "total": 1
+      },
+      "TRANSFER": {
+        "passing": 4,
+        "total": 4
+      },
+      "__reset": {
+        "passing": 1,
+        "total": 1
+      }
+    },
+    "max_step_latency_s": 0.001266040955670178
+  },
+  "failures": [
+    {
+      "sequence": "v2-s1",
+      "step": 2,
+      "class": "known_mismatch"
+    },
+    {
+      "sequence": "v2-s1",
+      "step": 3,
+      "class": "known_mismatch"
+    },
+    {
+      "sequence": "v2-s1",
+      "step": 4,
+      "class": "known_mismatch"
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h025-pair-Lucia-lucia",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-025: TRANSFER entre cuentas del mismo titular no aplica el límite E506; reglas de comparación del nombre"
+    ],
+    "experiment_ids": [
+      5029,
+      5030,
+      5031,
+      5032,
+      5033,
+      5034,
+      5035,
+      5036,
+      5037
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 5029,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 5030,
+      "x_req": 4752
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 5031,
+      "x_req": 4753
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;9999999999;4"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 5032,
+      "x_req": 4754
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;50000;59"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0002"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0002\"}"
+      },
+      "source_experiment_id": 5033,
+      "x_req": 4755
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;50001;56"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 5034,
+      "x_req": 4756
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;1;28"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0003"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0003\"}"
+      },
+      "source_experiment_id": 5035,
+      "x_req": 4757
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;100000;12"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 5036,
+      "x_req": 4758
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;1;28"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0004"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0004\"}"
+      },
+      "source_experiment_id": 5037,
+      "x_req": 4759
+    }
+  ]
+}

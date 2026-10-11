@@ -1,0 +1,457 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h016-auth",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-016: variantes de la cabecera Authorization y orden auth vs tamaño de cuerpo"
+    ],
+    "experiment_ids": [
+      3733,
+      3734,
+      3735,
+      3736,
+      3737,
+      3738,
+      3739,
+      3740,
+      3741,
+      3742,
+      3743,
+      3744,
+      3745,
+      3746,
+      3747,
+      3748,
+      3749
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3733,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "bearer <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3734,
+      "x_req": null
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "BEARER <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3735,
+      "x_req": null
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "<token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3736,
+      "x_req": null
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Bearer  <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3737,
+      "x_req": null
+    },
+    {
+      "step": 5,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3738,
+      "x_req": null
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Bearer"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3739,
+      "x_req": null
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Bearer\t<token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3740,
+      "x_req": null
+    },
+    {
+      "step": 8,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3741,
+      "x_req": null
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Token <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3742,
+      "x_req": null
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Basic <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3743,
+      "x_req": null
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "Authorization": "Bearer <token>x"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3744,
+      "x_req": null
+    },
+    {
+      "step": 12,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "none",
+        "raw": "{\"m\":\"PING;64\",\"p\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...<8222 chars>"
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3745,
+      "x_req": null
+    },
+    {
+      "step": 13,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "bad",
+        "raw": "{\"m\":\"PING;64\",\"p\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...<8222 chars>"
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3746,
+      "x_req": null
+    },
+    {
+      "step": 14,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "raw": "{\"m\":\"PING;64\",\"p\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...<8222 chars>"
+      },
+      "expected": {
+        "status": 413,
+        "body_kind": "json",
+        "body": {
+          "error": "E101",
+          "mensaje": "cuerpo demasiado grande"
+        },
+        "raw": "{\"error\":\"E101\",\"mensaje\":\"cuerpo demasiado grande\"}"
+      },
+      "source_experiment_id": 3747,
+      "x_req": 3615
+    },
+    {
+      "step": 15,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "none",
+        "raw": "not json"
+      },
+      "expected": {
+        "status": 401,
+        "body_kind": "json",
+        "body": {
+          "error": "E001",
+          "mensaje": "no autorizado"
+        },
+        "raw": "{\"error\":\"E001\",\"mensaje\":\"no autorizado\"}"
+      },
+      "source_experiment_id": 3748,
+      "x_req": null
+    },
+    {
+      "step": 16,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "method": "POST",
+        "path": "/msg",
+        "auth": "custom",
+        "headers": {
+          "authorization": "Bearer <token>"
+        },
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 3749,
+      "x_req": 3616
+    }
+  ]
+}

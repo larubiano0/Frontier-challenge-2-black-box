@@ -1,0 +1,224 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz2-2-1492",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-024: fuzz diferencial original vs reemplazo local (secuencias aleatorias de 2-12 pasos, controles del modelo)"
+    ],
+    "experiment_ids": [
+      6587,
+      6588,
+      6589,
+      6590,
+      6591,
+      6592,
+      6593,
+      6594,
+      6595,
+      6596
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 6587,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "consulta;ac-0004;5"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        },
+        "raw": "{\"error\":\"E401\",\"mensaje\":\"cuenta inexistente\"}"
+      },
+      "source_experiment_id": 6588,
+      "x_req": 6136
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-1;AC-0002;007;96"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 6589,
+      "x_req": 6137
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "alta;ana;50"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 6590,
+      "x_req": 6138
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "FOO;47"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E301",
+          "mensaje": "comando desconocido "
+        },
+        "raw": "{\"error\":\"E301\",\"mensaje\":\"comando desconocido \"}"
+      },
+      "source_experiment_id": 6591,
+      "x_req": 6139
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;ac-0001;AC-0001;999999;91"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        },
+        "raw": "{\"error\":\"E401\",\"mensaje\":\"cuenta inexistente\"}"
+      },
+      "source_experiment_id": 6592,
+      "x_req": 6140
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-1;007;90"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 6593,
+      "x_req": 6141
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 6594,
+      "x_req": 6142
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;op-0001;72"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 6595,
+      "x_req": 6143
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-1;5"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        },
+        "raw": "{\"error\":\"E401\",\"mensaje\":\"cuenta inexistente\"}"
+      },
+      "source_experiment_id": 6596,
+      "x_req": 6144
+    }
+  ]
+}

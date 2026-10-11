@@ -1,0 +1,204 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz2-2-751",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-024: fuzz diferencial original vs reemplazo local (secuencias aleatorias de 2-12 pasos, controles del modelo)"
+    ],
+    "experiment_ids": [
+      5846,
+      5847,
+      5848,
+      5849,
+      5850,
+      5851,
+      5852,
+      5853,
+      5854
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 5846,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;3"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 5847,
+      "x_req": 5475
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Ana;50"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 5848,
+      "x_req": 5476
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;ac-0001;AC-0004;abc;66"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 5849,
+      "x_req": 5477
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "anula;op-0002;69"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 5850,
+      "x_req": 5478
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "transfer;ac-0003;ac-0001;999999;82"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        },
+        "raw": "{\"error\":\"E401\",\"mensaje\":\"cuenta inexistente\"}"
+      },
+      "source_experiment_id": 5851,
+      "x_req": 5479
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "transfer;ac-0001;ac-0002;15"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E302",
+          "mensaje": "aridad inválida"
+        },
+        "raw": "{\"error\":\"E302\",\"mensaje\":\"aridad inválida\"}"
+      },
+      "source_experiment_id": 5852,
+      "x_req": 5480
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0002;46"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 5853,
+      "x_req": 5481
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;91"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 5854,
+      "x_req": 5482
+    }
+  ]
+}

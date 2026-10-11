@@ -1,0 +1,266 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz2-2-160",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-024: fuzz diferencial original vs reemplazo local (secuencias aleatorias de 2-12 pasos, controles del modelo)"
+    ],
+    "experiment_ids": [
+      5255,
+      5256,
+      5257,
+      5258,
+      5259,
+      5260,
+      5261,
+      5262,
+      5263,
+      5264,
+      5265,
+      5266
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 5255,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 5256,
+      "x_req": 4952
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 5257,
+      "x_req": 4953
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;86"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 5258,
+      "x_req": 4954
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0009;48"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 5259,
+      "x_req": 4955
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0002;69"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 5260,
+      "x_req": 4956
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;ac-0001;31"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 5261,
+      "x_req": 4957
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0004;63"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 5262,
+      "x_req": 4958
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": ";"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E104",
+          "mensaje": "segmento vacío"
+        },
+        "raw": "{\"error\":\"E104\",\"mensaje\":\"segmento vacío\"}"
+      },
+      "source_experiment_id": 5263,
+      "x_req": 4959
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;a;b;23"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E302",
+          "mensaje": "aridad inválida"
+        },
+        "raw": "{\"error\":\"E302\",\"mensaje\":\"aridad inválida\"}"
+      },
+      "source_experiment_id": 5264,
+      "x_req": 4960
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0002;AC-0001;50000;23"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E507",
+          "mensaje": "saldo insuficiente"
+        },
+        "raw": "{\"error\":\"E507\",\"mensaje\":\"saldo insuficiente\"}"
+      },
+      "source_experiment_id": 5265,
+      "x_req": 4961
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "deposito;ac-0001;007;70"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 5266,
+      "x_req": 4962
+    }
+  ]
+}

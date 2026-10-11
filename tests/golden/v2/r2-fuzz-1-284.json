@@ -1,0 +1,285 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz-1-284",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-024: fuzz diferencial original vs reemplazo local (secuencias aleatorias de 2-12 pasos, controles del modelo)"
+    ],
+    "experiment_ids": [
+      4034,
+      4035,
+      4036,
+      4037,
+      4038,
+      4039,
+      4040,
+      4041,
+      4042,
+      4043,
+      4044,
+      4045,
+      4046
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 4034,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 4035,
+      "x_req": 3871
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 4036,
+      "x_req": 3872
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;86"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 4037,
+      "x_req": 3873
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Hugo;51"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0003"
+        },
+        "raw": "{\"cuentaId\":\"AC-0003\"}"
+      },
+      "source_experiment_id": 4038,
+      "x_req": 3874
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0003;007;84"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 4039,
+      "x_req": 3875
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "FOO;47"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E301",
+          "mensaje": "comando desconocido "
+        },
+        "raw": "{\"error\":\"E301\",\"mensaje\":\"comando desconocido \"}"
+      },
+      "source_experiment_id": 4040,
+      "x_req": 3876
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": ""
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E103",
+          "mensaje": "falta control"
+        },
+        "raw": "{\"error\":\"E103\",\"mensaje\":\"falta control\"}"
+      },
+      "source_experiment_id": 4041,
+      "x_req": 3877
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Karla Q;66"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0004"
+        },
+        "raw": "{\"cuentaId\":\"AC-0004\"}"
+      },
+      "source_experiment_id": 4042,
+      "x_req": 3878
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;28"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 4043,
+      "x_req": 3879
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-1;AC-1;1.5;23"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 4044,
+      "x_req": 3880
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0002;007;77"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 4045,
+      "x_req": 3881
+    },
+    {
+      "step": 12,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "2500.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"2500.00\"}"
+      },
+      "source_experiment_id": 4046,
+      "x_req": 3882
+    }
+  ]
+}

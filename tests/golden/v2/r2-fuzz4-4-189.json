@@ -1,0 +1,186 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz4-4-189",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-026: fuzz diferencial final contra el parche de referencia (incluye HALT/NOTAS/typos/mismo titular)"
+    ],
+    "experiment_ids": [
+      7511,
+      7512,
+      7513,
+      7514,
+      7515,
+      7516,
+      7517,
+      7518
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 7511,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 7512,
+      "x_req": 6983
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 7513,
+      "x_req": 6984
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;86"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 7514,
+      "x_req": 6985
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;100000;6"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0002"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0002\"}"
+      },
+      "source_experiment_id": 7515,
+      "x_req": 6986
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSTO;58"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E301",
+          "mensaje": "comando desconocido ",
+          "sugerencia": "DEPOSITO"
+        },
+        "raw": "{\"error\":\"E301\",\"mensaje\":\"comando desconocido \",\"sugerencia\":\"DEPOSITO\"}"
+      },
+      "source_experiment_id": 7516,
+      "x_req": 6987
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Hugo Q;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0003"
+        },
+        "raw": "{\"cuentaId\":\"AC-0003\"}"
+      },
+      "source_experiment_id": 7517,
+      "x_req": 6988
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "NOTAS;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "notas": [
+            {
+              "id": "N-01",
+              "texto": "Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer."
+            }
+          ]
+        },
+        "raw": "{\"notas\":[{\"id\":\"N-01\",\"texto\":\"Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer.\"}]}"
+      },
+      "source_experiment_id": 7518,
+      "x_req": 6989
+    }
+  ]
+}

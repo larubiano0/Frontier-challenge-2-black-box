@@ -1,0 +1,284 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz3-3-436",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-024: fuzz diferencial original vs reemplazo local (secuencias aleatorias de 2-12 pasos, controles del modelo)"
+    ],
+    "experiment_ids": [
+      7052,
+      7053,
+      7054,
+      7055,
+      7056,
+      7057,
+      7058,
+      7059,
+      7060,
+      7061,
+      7062,
+      7063,
+      7064
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 7052,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 7053,
+      "x_req": 6562
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 7054,
+      "x_req": 6563
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "alta;mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0003"
+        },
+        "raw": "{\"cuentaId\":\"AC-0003\"}"
+      },
+      "source_experiment_id": 7055,
+      "x_req": 6564
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0003;AC-0001;12345678901;86"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 7056,
+      "x_req": 6565
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0003;8"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0003",
+          "saldo": "0.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0003\",\"saldo\":\"0.00\"}"
+      },
+      "source_experiment_id": 7057,
+      "x_req": 6566
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-1;AC-1;abc;11"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 7058,
+      "x_req": 6567
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0002;AC-0002;5000;15"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E304",
+          "mensaje": "origen y destino iguales"
+        },
+        "raw": "{\"error\":\"E304\",\"mensaje\":\"origen y destino iguales\"}"
+      },
+      "source_experiment_id": 7059,
+      "x_req": 6568
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;José;61"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0004"
+        },
+        "raw": "{\"cuentaId\":\"AC-0004\"}"
+      },
+      "source_experiment_id": 7060,
+      "x_req": 6569
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0004;AC-0009;12345678901;46"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E303",
+          "mensaje": "monto inválido"
+        },
+        "raw": "{\"error\":\"E303\",\"mensaje\":\"monto inválido\"}"
+      },
+      "source_experiment_id": 7061,
+      "x_req": 6570
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0001;72"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 7062,
+      "x_req": 6571
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "PING;64"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 7063,
+      "x_req": 6572
+    },
+    {
+      "step": 12,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0002;AC-0001;50000;23"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E507",
+          "mensaje": "saldo insuficiente"
+        },
+        "raw": "{\"error\":\"E507\",\"mensaje\":\"saldo insuficiente\"}"
+      },
+      "source_experiment_id": 7064,
+      "x_req": 6573
+    }
+  ]
+}

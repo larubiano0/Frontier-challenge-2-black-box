@@ -1,0 +1,245 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h020-halt",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-020 (nuevo): comando oculto HALT revelado por sugerencia de E301 (HOLA->HALT)"
+    ],
+    "experiment_ids": [
+      2961,
+      2962,
+      2963,
+      2964,
+      2965,
+      2966,
+      2967,
+      2968,
+      2969,
+      2970,
+      2971
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 2961,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;71"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E302",
+          "mensaje": "aridad inválida"
+        },
+        "raw": "{\"error\":\"E302\",\"mensaje\":\"aridad inválida\"}"
+      },
+      "source_experiment_id": 2962,
+      "x_req": 2900
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;5X"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E201",
+          "mensaje": "control mal formado"
+        },
+        "raw": "{\"error\":\"E201\",\"mensaje\":\"control mal formado\"}"
+      },
+      "source_experiment_id": 2963,
+      "x_req": 2901
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;1"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E202",
+          "mensaje": "control inválido"
+        },
+        "raw": "{\"error\":\"E202\",\"mensaje\":\"control inválido\"}"
+      },
+      "source_experiment_id": 2964,
+      "x_req": 2902
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;X;42"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2965,
+      "x_req": 2903
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;AC-0001;82"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2966,
+      "x_req": 2904
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "halt;71"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E302",
+          "mensaje": "aridad inválida"
+        },
+        "raw": "{\"error\":\"E302\",\"mensaje\":\"aridad inválida\"}"
+      },
+      "source_experiment_id": 2967,
+      "x_req": 2905
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "PING;64"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 2968,
+      "x_req": 2906
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 2969,
+      "x_req": 2907
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "0.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"0.00\"}"
+      },
+      "source_experiment_id": 2970,
+      "x_req": 2908
+    },
+    {
+      "step": 10,
+      "kind": "http",
+      "method": "GET",
+      "path": "/health",
+      "request": {
+        "method": "GET",
+        "path": "/health"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 2971,
+      "x_req": null
+    }
+  ]
+}

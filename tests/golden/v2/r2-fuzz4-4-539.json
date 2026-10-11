@@ -1,0 +1,223 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-fuzz4-4-539",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-026: fuzz diferencial final contra el parche de referencia (incluye HALT/NOTAS/typos/mismo titular)"
+    ],
+    "experiment_ids": [
+      7861,
+      7862,
+      7863,
+      7864,
+      7865,
+      7866,
+      7867,
+      7868,
+      7869,
+      7870
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 7861,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 7862,
+      "x_req": 7300
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 7863,
+      "x_req": 7301
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;86"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 7864,
+      "x_req": 7302
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Ana;50"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0003"
+        },
+        "raw": "{\"cuentaId\":\"AC-0003\"}"
+      },
+      "source_experiment_id": 7865,
+      "x_req": 7303
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "Q;AC-0001;16"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E301",
+          "mensaje": "comando desconocido "
+        },
+        "raw": "{\"error\":\"E301\",\"mensaje\":\"comando desconocido \"}"
+      },
+      "source_experiment_id": 7866,
+      "x_req": 7304
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0003;AC-0002;40000;56"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E507",
+          "mensaje": "saldo insuficiente"
+        },
+        "raw": "{\"error\":\"E507\",\"mensaje\":\"saldo insuficiente\"}"
+      },
+      "source_experiment_id": 7867,
+      "x_req": 7305
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0002;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0002",
+          "saldo": "0.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0002\",\"saldo\":\"0.00\"}"
+      },
+      "source_experiment_id": 7868,
+      "x_req": 7306
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0002;AC-0003;100000;72"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 7869,
+      "x_req": 7307
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0009;AC-0001;250000;40"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E401",
+          "mensaje": "cuenta inexistente"
+        },
+        "raw": "{\"error\":\"E401\",\"mensaje\":\"cuenta inexistente\"}"
+      },
+      "source_experiment_id": 7870,
+      "x_req": 7308
+    }
+  ]
+}

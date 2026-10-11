@@ -49,10 +49,10 @@ SUGGESTION_MAX_DISTANCE = 2
 
 def suggest_command(command: str, known: list[str]) -> str | None:
     """Closest known command (case-insensitive) within distance <= 2.
-    Ties: first in `known` order (supuesto, ties never probed)."""
+    Ties go to the alphabetically first command (ids 3597-3611)."""
     upper = command.upper()
     best, best_d = None, SUGGESTION_MAX_DISTANCE + 1
-    for name in known:
+    for name in sorted(known):
         d = levenshtein(upper, name)
         if d < best_d:
             best, best_d = name, d

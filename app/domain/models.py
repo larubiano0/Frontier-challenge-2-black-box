@@ -25,3 +25,4 @@ class State:
     operations: dict[str, Operation] = field(default_factory=dict)
     next_account_seq: int = 1
     next_operation_seq: int = 1
+    halted: bool = False      # set by HALT;1; cleared only by /__reset (new State)

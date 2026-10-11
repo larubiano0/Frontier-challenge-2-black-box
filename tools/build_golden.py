@@ -20,6 +20,7 @@ Usage: python -m tools.build_golden [--log ...] [--trace ...] [--check]
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -36,6 +37,8 @@ SCHEMA = "golden-sequence/1"
 STATELESS_SEQUENCES = {
     "h003-entrada": "ids 64-92: /health, auth failures, unknown routes/methods, malformed bodies, PING; "
                      "no step reads or writes accounts/operations (the two /__reset calls are unauthorized)",
+    "r2-h023-routes": "ids 3356-3371: unauthenticated/fake-token probes of unknown routes (all 404 E404); "
+                      "no step reads or writes state",
     "h003-limits2": "ids 2804-2821: PING bodies of increasing size (body-size limit); state-independent",
 }
 PLAIN_RESET_REQUEST = {"method": "POST", "path": "/__reset"}
@@ -154,7 +157,10 @@ def write_fixtures(suite: str, fixtures: dict[str, dict], check_only: bool) -> l
     outdir.mkdir(parents=True, exist_ok=True)
     msgs: list[str] = []
     for seq, fx in fixtures.items():
-        path = outdir / f"{seq}.json"
+        # Case-insensitive filesystems (macOS) would merge names like "pair-Lucia-lucia" / "pair-Lucia-LUCIA":
+        # names containing upper-case letters get a short hash suffix (sequence_id inside the file is exact).
+        fname = seq if seq == seq.lower() else f"{seq}~{hashlib.sha1(seq.encode()).hexdigest()[:6]}"
+        path = outdir / f"{fname}.json"
         new_text = json.dumps(fx, indent=2, ensure_ascii=False) + "\n"
         if path.exists():
             old = json.loads(path.read_text(encoding="utf-8"))

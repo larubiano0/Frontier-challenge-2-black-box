@@ -241,3 +241,162 @@ Notation: `S(n)` = step n of the sequence. "v1 EX-n" = historical, `id n` = obse
 1. `INVESTIGATE H-001, budget=14` — 11 requests, all known controls, only plausible handle on the 3rd change, 6–12-step sequence shape.
 2. `INVESTIGATE H-004, budget=16` — 13 requests, decides precedence everywhere and whether H-005/H-006 are viable.
 3. `INVESTIGATE H-003, budget=17` — 14 single requests that replace guaranteed placeholder failures; requires waiver of the 401/403 abort rule for probes 2–5.
+
+---
+---
+
+# ROUND 2 — PROPOSE pass after the 2nd hidden run (89/100)
+
+_Mode `PROPOSE`. **0 original requests sent, `app/` untouched.** Only offline artifacts: this section and `tools/analysis/{robust_local,r2_plan}.py` (local, no network). System clock at write time: **18:15 Bogotá (≈1 h 45 min to 20:00)**; the researcher says "<1 h", so everything below is sized for ≈45 min of work: ≈10 min of probes, 20 min of fixes, 15 min of regression/deploy._
+
+## R0. What I could and could not use
+
+- **No screenshot reached me** — only the numbers in the message (89/100; Easy 39/40, Medium 36/40, Hard 14/20; 8 status diffs, 3 body diffs; 5 failures on the first request, 6 later; median 598 ms). **The dashboard figures do not name the 11 failing tests, so I cannot map failures to inputs.** If `/evento/resultados` shows even one failing test (its steps, expected vs actual), paste it: that is worth more than any hypothesis below.
+- Local re-run (mine): golden v2 **43/43 sequences, 2,880/2,880 requests**, 0 regressions, max latency 4.4 ms; `pytest` **132 passed**; 31 local robustness inputs (`tools/analysis/robust_local.py`: invalid UTF-8, BOM, UTF-16, lone surrogate, NaN, 5 000-deep JSON, wrong auth schemes, HEAD/OPTIONS/PATCH, query strings…) → **0 × 5xx, no crash**. The replacement is internally consistent; the remaining errors are *behaviors the log never exercised*.
+- Counter: 2,880 of 8,000 used by the tool (true use unknown). A full round-2 probe pass below is ≤ ~85 original requests.
+
+## R1. Deductions that narrow the 11 failures (no guessing)
+
+1. **A first request after `/__reset` runs against empty state**, so its answer is a pure function of the request. The **5 first-request failures** therefore come from *stateless* behavior: control value (E202), parsing, E301 rule, route/method/auth, or empty-state error precedence. (Inference from the definition; certain.)
+2. **State-dependent behavior (E510, ANULA reversal, saldo) cannot explain the 1 Easy failure** if Easy = single-request tests (README: 40 single). E510 needs ≥ 7 steps (ALTA×2, DEPOSITO, 3 failures, 4th) → can only live in the Hard tests. So the *later-in-sequence* group (6) and the Hard misses (6) very likely overlap, and the first-request group (5) ≈ Easy 1 + Medium 4 (inference; overlap not certain).
+3. Statuses vs bodies: a **status** diff (8) is E202-vs-OK, E510(423)-vs-E506/E507/200, 404-vs-200, 401-vs-200. A **body-only** diff (3) is a same-status case: **E301 `sugerencia`**, E510 `intentos`, `saldo` text, ANULA body. Of those, only E301 and saldo have thin evidence (see R2).
+4. **Coverage gaps measured in the log (all 2,880 rows re-read):**
+   - Letters **H, J, K, Q, V, W never appear in any request** (log has A B C D E F G I L M N O P R S T U X Y Z). The control model (A=1…Z=26) was fitted on 91 pairs *without them* → names such as Hugo, Javier, Karla, Valeria, Wendy, Raquel are unverified.
+   - **Non-ASCII** appears once (`PING;１２`, exempt). Accents/ñ/ß in names: never probed (`INT-09` supuesto).
+   - **E301**: only **15 distinct commands**; two rule families fit them all: *Levenshtein ≤ 2* (implemented) and *relative/similarity* (difflib ratio ≥ 0.73–0.75, or dist/len ≤ 0.34–0.4). They disagree on `AL`, `PI`, `TRANS`, `TRANSFERENCIA`, `ANU` (my fit table, `r2_plan.py`).
+   - **`saldo`**: 30 samples; the only negative is `-400.00`; no value in (−1,1) except `0.00`.
+   - **Auth**: only "none" and "bad" token (ids 65–69). Lower-case `bearer`, raw token, double space: never. **HEAD/OPTIONS/PATCH, query strings, `%`-encoding: never** (`ENT-17` supuesto).
+   - **ANULA × E510**: the only ANULA on a blocked account (id 2220) was followed by no transfer; `CMD-ANU-08`/`MEM-14` are `supuesto`.
+   - Whitespace-only account name (`ALTA; ;ctl`): never.
+5. **Shared-root-cause candidates** (one cause → several tests): (a) the *control input classes* (letters/non-ASCII) would hit every command containing them, at the first request, as a 400-vs-2xx **status** diff; (b) *E301 rule* → body-only diffs at any step; (c) *ANULA×E510* → 423-vs-200/422 **status** diffs at the end of Hard tests; (d) *deployment* (multi-process/instances) → random later-step failures. (a),(b),(d) are the ones that can produce the observed 5-first / 6-later split.
+6. **LLM fallback — evaluated, rejected.** After the build every unevidenced branch (`501`) was removed, so there is *no* "out-of-coverage" domain to delegate. A model would only be able to overwrite deterministic answers with plausible ones (E404/E301/E510 are byte-exact), add latency (median is already 598 ms; limit 5 s) and nondeterminism. Expected gain ≈ 0, risk > 0. Not proposed.
+
+## R2. Ranking (score ≈ P(removes ≥1 of the 11) × tests hit / original requests)
+
+| ID | Hypothesis (one line) | Category | v1→v2 change? | Orig. req | Cap | EV (tests saved, ordinal) | Risk if wrong |
+|---|---|---|---|---|---|---|---|
+| **H-017** | Deployed replacement ≡ local replacement (single process, same bodies/statuses, no state drift) | entrada / despliegue | no | **0** (own deployment only) | n/a (≈150 req to *our* URL) | High tail: 0–N tests; P≈10 % | none |
+| **H-012** | E301 `sugerencia` is Levenshtein ≤ 2, not a relative/similarity rule | códigos/mensajes | possible (3rd-change candidate b) | 5 | 8 | Med-high: P≈25 %, ≈2 tests | none |
+| **H-011** | Control model holds for unseen inputs: letters H J K Q V W, accents/ñ/ß, whitespace-only name | integridad / parsing | no | 6 (+≤3 follow-ups) | 10 | Med-high tail: P≈8 %, up to several ALTA tests | none |
+| **H-013** | A successful `ANULA` does not reset/clear the E510 block (both TRANSFER- and DEPOSITO-reversal) | cancelación / estado | possible (3rd-change candidate a) | 10 (+9 if needed) | 21 | Medium: P≈20 %, ≈1–2 Hard tests | none |
+| **H-015** | HEAD/OPTIONS/query/`%`/trailing slash behave as `E404`/ignored query | entrada/rutas | unknown | 8 | 10 | Low-med: P≈10 % | none |
+| **H-016** | Auth variants (lower-case `bearer`, raw token, double space, empty) and auth-vs-body-size order | entrada/auth | unknown | 6 | 8 | Low-med: P≈8 % | needs waiver of "abort on 401" |
+| **H-014** | `saldo` formatting for |balance| < 1 unit and negative non-multiples of 100 | parsing / estado | possible (D-A detail) | 8 | 10 | Low: P≈10 %, ≈0–1 test | none |
+| **H-018** | (meta) per-test detail of the 11 failures from `/evento/resultados` | — | — | 0 | — | Highest if available | — |
+
+If <45 min remain: run **H-017 → H-012 → H-011** only (≈11 original requests); then H-013 seqA (10).
+
+---
+
+### H-017 — Deployed ≡ local (own deployment, 0 original requests)
+1. **Statement.** For every golden sequence, the *deployed* URL returns the same status/body as the local app, repeatably, from a fresh `/__reset`. Refuted by any diff, or by two runs of the same sequence differing.
+2. **Evidence.** Local 2,880/2,880 (observed v2 vs local). **Absent:** any deployed-instance regression run (`Plan.md` M6); `Procfile` has no `--workers` flag, but uvicorn reads `WEB_CONCURRENCY` from the environment (if Railway/buildpack sets it > 1, state would split per process → *random later-step failures*, which matches "6 later failures"); `README.md` says "one instance" but nothing verifies it.
+3. **Competing.** (a) single process, identical; (b) `WEB_CONCURRENCY`/replicas > 1 → intermittent 404 E401/E402 on later steps; (c) env var `FRONTIER_TOKEN` trailing whitespace/quotes → 401 on some paths (no: 89 passed); (d) cold start/timeouts on first request (median 598 ms rules out systematic).
+4. **Probe (against OUR deployed URL, never the original).** Replay the 12-step `h001-anula` + `h010-bloqueo-a` (15 steps) + 10 random golden sequences, **30 repetitions each** (≈150 requests, ≈25 s at 6 req/s). Compare with the local replay; flag any run-to-run difference. Then `echo $WEB_CONCURRENCY` / check the Railway service variables and replica count.
+5. **Prediction.** (a) 0 diffs in 30 runs. (b) ≥1 sequence with a diff on a step ≥ 2 (probability per sequence ≈ 1−(1/k)^(steps−1)). Mechanical.
+6. **Stop/abort.** Stop at first diff (then fix: Procfile `--workers 1`, set `WEB_CONCURRENCY=1`, 1 replica). Never send any request to the original.
+7. **Accounting.** 0 original requests; ≈150 requests to our own URL (no daily limit applies).
+8. **Impact.** Could explain any subset of the 6 later failures; closes `Plan.md` M6. 9. **Bookkeeping.** Not an FR-0153 item.
+
+### H-012 — E301 suggestion rule
+1. **Statement.** `sugerencia` = closest known command with **Levenshtein ≤ 2** (case-insensitive), regardless of input length. Refuted by `AL;53`→ no suggestion, or `TRANSFERENCIA;49`→ `TRANSFER`.
+2. **Evidence (observed v2).** 15 distinct unknown commands, e.g. `PNG`→PING (220), `PONG`→PING (602), `ANUL`→ANULA (696), `ALTAXY`→ALTA (445), `TRANSF`→TRANSFER (800), `TRANSFERIR`→TRANSFER (365), `DEPOSITOX` (795), `CONSULTAS` (303); none: `ALTAXYZ`, `CONS`, `PINGPONG`, `SALDO`, `SALDOS`, `XYZ`. All fit lev≤2, lev/maxlen≤0.34–0.4, difflib ratio ≥0.73–0.75.
+3. **Competing.** 12a lev ≤ 2 (implemented); 12b relative (dist/maxlen ≤ ~0.34); 12c similarity ratio ≥ ~0.75; 12d lev ≤ 2 **and** input length ≥ 3. Ties between two commands: none exist within 1 edit (checked), so tie-breaking is irrelevant in practice.
+4. **Probe `h012-e301`** (stateless, no reset needed; controls from the local model, which E202 would reveal if wrong):
+   `{"m":"AL;53"}` · `{"m":"PI;76"}` · `{"m":"TRANS;71"}` · `{"m":"TRANSFERENCIA;49"}` · `{"m":"ANU;76"}`.
+5. **Predictions** (all `400 E301`, mensaje `"comando desconocido "`; entry = `sugerencia`):
+
+| input | 12a lev≤2 | 12b rel≤.34 | 12c ratio≥.75 | 12d len≥3 |
+|---|---|---|---|---|
+| AL | ALTA | none | none | none |
+| PI | PING | none | none | none |
+| TRANS | none | none | TRANSFER | none |
+| TRANSFERENCIA | none | none | TRANSFER | none |
+| ANU | ANULA | none | ANULA | ANULA |
+
+   (A response `400 E202` means the control model is wrong for that string → see H-011.) The pattern over 5 requests selects a/b/c/d uniquely.
+6. **Stop.** Stop after 5 (all models separated). Abort on rate-limit header, 401/403, 5xx. 7. **Accounting.** 5; cap 8.
+8. **Impact.** Every hidden test with an unknown command whose distance ≤ 2 *or* a short/long typo. Fix = one line in `app/domain/rules.py:suggest_command`. 9. **Bookkeeping.** Candidate for the unidentified third change (`CAM-04`); a rule that differs from Levenshtein does not change that.
+
+### H-011 — Control model on unseen inputs
+1. **Statement.** E202 uses ASCII `[A-Za-z0-9]` only, with A=1…Z=26 for **all** letters, and ignores everything else (accents, `ß`, whitespace). Refuted by `E202` for the probe with the predicted control.
+2. **Evidence.** 91 pairs, 0 misfit (`reports/control_rows.json`); letters seen: `ABCDEFGILMNOPRSTUXYZ`; **not seen: H J K Q V W**; non-ASCII never.
+3. **Competing.** 11a model as implemented. 11b the mapping of H J K Q V W deviates from alphabetical order. 11c accents stripped by NFD (`José`→`Jose`). 11d JS `toUpperCase` (`ß`→`SS`). 11e Unicode letters counted via `ord-64`.
+4. **Probe `h011-ctl`** (stateless; `ANULA;<x>` returns `404 E402` when the control is accepted — never mutates state; one reset not needed). Literal bodies:
+   `{"m":"ANULA;HJKQVW;42"}` · `{"m":"ANULA;José;48"}` · `{"m":"ANULA;Ñandú;69"}` · `{"m":"ANULA;Straße;18"}` · `{"m":"ALTA; ;85"}`.
+   Follow-ups only if E202: `ANULA;José;68` (11c), `ANULA;Ñandú;26` (11c), `ANULA;Straße;31` (11d). If `HJKQVW` is E202, isolate with `ANULA;H;29`, `ANULA;J;6`, `ANULA;K;3`, `ANULA;Q;82`, `ANULA;V;67`, `ANULA;W;64` (≤6).
+5. **Predictions.**
+
+| probe | 11a (impl.) | 11c NFD | 11d ß→SS | 11b/11e |
+|---|---|---|---|---|
+| `ANULA;HJKQVW;42` | 404 E402 | 404 E402 | 404 E402 | **400 E202** |
+| `ANULA;José;48` | 404 E402 | E202 (needs 68) | 404 E402 | E202 |
+| `ANULA;Ñandú;69` | 404 E402 | E202 (needs 26) | 404 E402 | E202 |
+| `ANULA;Straße;18` | 404 E402 | 404 E402 | **E202** (needs 31) | E202 |
+| `ALTA; ;85` | 201 `AC-0001` (name " " accepted) | same | same | alt.: `400 E104` if the name is trimmed |
+
+6. **Stop.** All five as 11a ⇒ stop (model confirmed on these classes). First E202 ⇒ run its follow-ups (≤3–6), then stop; if no follow-up matches, **do not scan** (needs a new cap; ≤97 per string). Abort on 401/403/5xx/rate-limit.
+7. **Accounting.** 5 base + ≤3 follow-ups + ≤6 isolation (conditional) = 5 expected, **cap 10**. State touched: one account in `ALTA; ;85` → reset after (add 1) → cap 11.
+8. **Impact.** Any command containing those letters/characters, at the first request. Fix = ≤5 lines in `app/domain/control.py`. 9. **Bookkeeping.** Not FR-0153 (control invariant across v1/v2 rows).
+
+### H-013 — ANULA × E510 (does a successful ANULA clear the block?)
+1. **Statement.** A successful `ANULA` (of either a TRANSFER credited back to the blocked source, or of a DEPOSITO debiting it) leaves the account blocked: the next transfer from it is `423 E510`. Refuted by 200/422 instead.
+2. **Evidence.** E510: ids 1998–2004, 2877–2880 (confirmado); ANULA on blocked account answered `200 {"ok":true…}` (id 2220) but **no transfer followed**; E510 resets known: success TRANSFER from the account, DEPOSITO into it; **not** reset: CONSULTA, PING, ALTA, unknown cmd, other deposit, E303, ANULA→E402, other-account E507. **Absent:** *successful* ANULA vs the streak.
+3. **Competing.** 13a no effect (implemented). 13b any successful ANULA clears streak/block of the accounts it touches. 13c only a reversal that **credits** the account (TRANSFER undone) clears. 13d only reversal that debits clears (unlikely).
+4. **Probes.** `h013-a` (10 req): `POST /__reset` · `ALTA;Lucia;82` · `ALTA;Mateo;3` · `DEPOSITO;AC-0001;250000;86` · `TRANSFER;AC-0001;AC-0002;40000;86` · `TRANSFER;AC-0001;AC-0002;100000;12` ×3 · `ANULA;OP-0002;69` · `TRANSFER;AC-0001;AC-0002;40000;86`.
+   `h013-b` (9 req, run only if h013-a shows 13a): `POST /__reset` · `ALTA;Lucia;82` · `ALTA;Mateo;3` · `DEPOSITO;AC-0001;250000;86` · `TRANSFER;AC-0001;AC-0002;100000;12` ×3 · `ANULA;OP-0001;72` · `TRANSFER;AC-0001;AC-0002;40000;86`.
+5. **Predictions (last step).**
+
+| probe | 13a no effect | 13b any ANULA clears | 13c credit-only clears |
+|---|---|---|---|
+| h013-a last | `423 E510 intentos:1` | `200 OP-0003` | `200 OP-0003` |
+| h013-b last (balance 0 after reversal) | `423 E510 intentos:1` | `422 E507` | `423 E510 intentos:1` |
+
+   (Steps before the last must read: 201, 201, 200 OP-0001, 200 OP-0002 [a only], 422 E506 ×3, `200 {"ok":true,"anulada":…}`; local replay: `r2_plan.py`.)
+6. **Stop.** h013-a = 13b/13c ⇒ stop (and test h013-b to separate b/c only if time). h013-a = 13a ⇒ run h013-b; if also 13a ⇒ stop (hypothesis confirmed). Abort on 401/403/5xx/rate-limit or any diff in known prefix steps.
+7. **Accounting.** 10 (+9). Cap 21. 8. **Impact.** Hard tests with block + cancel (1–2). Fix = a call to `_clear_block` in `anula` (`commands.py`). 9. **Bookkeeping.** Candidate for the third change only as part of the E510 feature (a v2 feature never shown in v1).
+
+### H-015 — HEAD / OPTIONS / query / encoding / trailing slash
+1. **Statement.** `HEAD /health`, `OPTIONS /msg`, `OPTIONS /health` return `404 E404` (same as other methods); a query string is ignored on known routes; `/m%73g` and `/health/` are **not** the known routes. Refuted by any 200/204.
+2. **Evidence.** Other methods E404: ids 70–77 (GET/PUT/POST on known paths), `/msg/`, `/MSG` (91, 92). **Absent:** HEAD, OPTIONS, PATCH/DELETE, queries, `%`-encoding, `//`. The service looks Node-like (`application/json; charset=utf-8`); Node frameworks often answer HEAD for GET routes and OPTIONS automatically.
+3. **Competing.** 15a all E404 (implemented; HEAD currently `404` with empty body). 15b HEAD `/health` → 200 (framework default). 15c OPTIONS → 200/204 with `Allow`. 15d query makes the route unknown (404). 15e percent-decoded `/m%73g` matches (current local behavior: **200 pong**; Starlette decodes the path).
+4. **Probe `h015-http`** (authorized, state-free): `HEAD /health` · `OPTIONS /msg` · `OPTIONS /health` · `GET /health?x=1` · `POST /msg?x=1` body `{"m":"PING;64"}` · `GET /health/` · `POST /m%73g` body `{"m":"PING;64"}` · `POST //msg` same body.
+5. **Predictions (current replacement):** 404 E404 (empty for HEAD) · 404 · 404 · 200 `{"ok":true}` · 200 pong · 404 · **200 pong (suspect)** · 404. Any other observation selects the alternative.
+6. **Stop.** After 8; abort on rate-limit/5xx. 7. **Accounting.** 8; cap 10 (needs the probe tool to accept HEAD/OPTIONS). 8. **Impact.** Possible first-request status diffs (Entrada tests); fixes in `routes.py` only. 9. **Bookkeeping.** unknown version status.
+
+### H-016 — Auth header variants and order
+1. **Statement.** Only an exact `Bearer <token>` is accepted (case-sensitive scheme, one space); anything else → `401 E001`; auth is evaluated before body size. Refuted by a 200 on lower-case `bearer`, or `413` when unauthenticated with an 8193-byte body.
+2. **Evidence.** `none`/`bad` token → 401 E001 on the 3 known routes (65–69); unknown route precedes auth (77). **Absent:** scheme case, raw token, extra spaces, empty token, auth-vs-413. Current code accepts any case of `bearer` (`app/core/auth.py`, `supuesto`).
+3. **Competing.** 16a case-insensitive scheme (implemented); 16b strict `Bearer `; 16c token anywhere in header. Order: E001 first (implemented) vs E101 first.
+4. **Probe `h016-auth`:** `POST /msg {"m":"PING;64"}` with headers `Authorization: bearer <tok>` · `Authorization: <tok>` · `Authorization: Bearer  <tok>` (two spaces) · `Authorization: Bearer ` · unauthenticated `POST /msg` with an 8193-byte body · authenticated 8193-byte body (control: known 413).
+5. **Predictions (impl.):** 200 pong · 401 · 401 · 401 · 401 E001 · 413 E101. 16b ⇒ first is 401. E101-first ⇒ fifth is 413.
+6. **Stop/abort.** Waiver of "abort on 401" required (expected). Abort on rate-limit/5xx. 7. **Accounting.** 6; cap 8. 8. **Impact.** Entrada tests ("otro token / sin token"): most already pass; only variants matter. 9. n/a.
+
+### H-014 — `saldo` formatting near zero and for negative non-multiples of 100
+1. **Statement.** `saldo` = `sign + whole + "." + 2-digit cents`: balance −50 → `"-0.50"`, +50 → `"0.50"`. Refuted by `"0.50"` for −50 (sign lost), `"-1.-50"`, `"-0.5"` etc.
+2. **Evidence.** 30 `saldo` samples (`-400.00`, `0.00`, `2500.01`, `110002499.98`, …). **Absent:** |x| < 1 unit other than 0, negative non-multiples. JS-style implementations differ exactly here (`Math.trunc(-0.5)` = −0 prints `0`).
+3. **Competing.** 14a implemented; 14b sign lost for −1…−99; 14c floor-based (`-1.-50`); 14d `toFixed` (same as a).
+4. **Probe `h014-saldo`** (8 req): `POST /__reset` · `ALTA;Lucia;82` · `ALTA;Mateo;3` · `DEPOSITO;AC-0001;50;54` · `TRANSFER;AC-0001;AC-0002;50;87` · `ANULA;OP-0001;72` · `CONSULTA;AC-0001;14` · `CONSULTA;AC-0002;11`.
+5. **Prediction.** Steps 4–6: 200 OP-0001, 200 OP-0002, `200 {"ok":true,"anulada":"OP-0001"}`. Step 7: a/d `"-0.50"`; b `"0.50"`; c `"-1.-50"`. Step 8: `"0.50"` (all).
+6. **Stop.** After step 7 if a. Abort as above. 7. **Accounting.** 8; cap 10. 8. **Impact.** Body diffs in Hard ANULA chains with sub-unit amounts (rare: all known amounts are multiples of 100). 9. Detail of D-A (CAM-01).
+
+### H-018 — (meta) get the per-test failure detail
+If the evaluation page lists failed tests or their first differing step, paste ≥3 of them. Each one converts a hypothesis into a fact (and may identify a *stateless* root cause that the five probes above cannot find). Cost 0.
+
+## R3. Execution order, cut rules and regression discipline
+
+| # | Do | Orig. req | Wall time | Cut if |
+|---|---|---|---|---|
+| 1 | H-017 (deployed ≡ local) | 0 | ≈5 min | never (free) |
+| 2 | H-012 + H-011 together (stateless, 10–11 req) | 10–11 | ≈3 min | — |
+| 3 | H-013-a (10 req; b only if a=13a) | 10–19 | ≈4 min | <35 min left |
+| 4 | H-015 + H-016 | 14 | ≈4 min | <30 min left |
+| 5 | H-014 | 8 | ≈3 min | <30 min left |
+| — | Sentinel re-check (≥ 40 req reserved), e.g. h001-anula + h010-bloqueo-a (≈ 26) | ≈26 | ≈5 min | at ≈19:30 |
+
+Total worst case ≈ 85 original requests; daily counter would reach ≈ 2,965 of 8,000.
+**Rules for the implementing agent (no guessing):** a fix is applied **only** when a probe *contradicts* the current implementation; each fix = (i) new fixture from the probe's log ids, (ii) `python -m tools.run_golden` must stay 43+new / 100 %, (iii) `python -m pytest` green, (iv) one-line diff documented in `Documentation.md`. Predictions confirmed ⇒ record "confirmado" (spec rows `INT-09`, `ENT-17`, `CMD-UNK-03`, `CMD-ANU-08`/`MEM-14`) and change nothing.
+
+**Expected effect (inference, not a promise):** the stateless probes (H-011/12/15/16) address the 5 first-request failures; H-013/H-014/H-017 the 6 later ones. If every prediction holds, **no code changes** and the remaining 11 are due to inputs I cannot see → use H-018. Realistic gain 0–6 tests; I would not claim more.
+
+**Final evaluation run:** none of this needs the last run. Use it **once**, after the probes and any fixes are deployed and H-017 passes, to read the new failure breakdown; do not use it to test individual hypotheses.

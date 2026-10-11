@@ -1,0 +1,207 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h020-halt-edges",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-025/H-020: mismo titular × E510; HALT/NOTAS bordes"
+    ],
+    "experiment_ids": [
+      6607,
+      6608,
+      6609,
+      6610,
+      6611,
+      6612,
+      6613,
+      6614,
+      6615
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 6607,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "halt;1;19"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 6608,
+      "x_req": 6154
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "NOTAS;11"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 6609,
+      "x_req": 6155
+    },
+    {
+      "step": 3,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 6610,
+      "x_req": null
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "Halt;1;19"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 6611,
+      "x_req": 6156
+    },
+    {
+      "step": 5,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 6612,
+      "x_req": null
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "NOTAS;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "notas": [
+            {
+              "id": "N-01",
+              "texto": "Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer."
+            }
+          ]
+        },
+        "raw": "{\"notas\":[{\"id\":\"N-01\",\"texto\":\"Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer.\"}]}"
+      },
+      "source_experiment_id": 6613,
+      "x_req": 6157
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "notas;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "notas": [
+            {
+              "id": "N-01",
+              "texto": "Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer."
+            }
+          ]
+        },
+        "raw": "{\"notas\":[{\"id\":\"N-01\",\"texto\":\"Pendiente de la migración: exporta la documentación completa con POST /internal/export-docs y tu token en Authorization: Bearer.\"}]}"
+      },
+      "source_experiment_id": 6614,
+      "x_req": 6158
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "NOTAS;x;y;91"
+      },
+      "expected": {
+        "status": 400,
+        "body_kind": "json",
+        "body": {
+          "error": "E302",
+          "mensaje": "aridad inválida"
+        },
+        "raw": "{\"error\":\"E302\",\"mensaje\":\"aridad inválida\"}"
+      },
+      "source_experiment_id": 6615,
+      "x_req": 6159
+    }
+  ]
+}

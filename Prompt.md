@@ -19,7 +19,7 @@ Ticket **FR-0153** (HIGH, opened 15:30 Bogotá): *"The provider deployed version
 
 ## Authoritative materials
 
-1. The organizers' `README.md` is the binding competition contract.
+1. The organizers' `OLD_README.md` is the binding competition contract.
 2. `pruebas/ejemplos.jsonl` contains **20 requests in one ordered sequence after a reset**, captured against the morning version (**version 1**). It is **historical v1 evidence**, valuable for hypotheses, but **not** automatically current expected behavior; version 2 may differ in exactly three behaviors.
 3. The current original service, queried through authorized experiments, provides additional evidence; it now runs **version 2** and may change again.
 4. `Documentation.md`, `experimentos.jsonl`, and the inferred specification are derived research artifacts, not substitutes for observations.

@@ -1,0 +1,447 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h013-e-intentos-cap",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-013: ¿un ANULA exitoso reinicia/limpia el bloqueo E510?"
+    ],
+    "experiment_ids": [
+      3670,
+      3671,
+      3672,
+      3673,
+      3674,
+      3675,
+      3676,
+      3677,
+      3678,
+      3679,
+      3680,
+      3681,
+      3682,
+      3683,
+      3684,
+      3685,
+      3686,
+      3687,
+      3688,
+      3689
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3670,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 3671,
+      "x_req": 3571
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 3672,
+      "x_req": 3572
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;250000;86"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 3673,
+      "x_req": 3573
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;100000;12"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 3674,
+      "x_req": 3574
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;100000;12"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 3675,
+      "x_req": 3575
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;100000;12"
+      },
+      "expected": {
+        "status": 422,
+        "body_kind": "json",
+        "body": {
+          "error": "E506",
+          "mensaje": "límite excedido"
+        },
+        "raw": "{\"error\":\"E506\",\"mensaje\":\"límite excedido\"}"
+      },
+      "source_experiment_id": 3676,
+      "x_req": 3576
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 1
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":1}"
+      },
+      "source_experiment_id": 3677,
+      "x_req": 3577
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 2
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":2}"
+      },
+      "source_experiment_id": 3678,
+      "x_req": 3578
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 3
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":3}"
+      },
+      "source_experiment_id": 3679,
+      "x_req": 3579
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 4
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":4}"
+      },
+      "source_experiment_id": 3680,
+      "x_req": 3580
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 5
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":5}"
+      },
+      "source_experiment_id": 3681,
+      "x_req": 3581
+    },
+    {
+      "step": 12,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 6
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":6}"
+      },
+      "source_experiment_id": 3682,
+      "x_req": 3582
+    },
+    {
+      "step": 13,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 7
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":7}"
+      },
+      "source_experiment_id": 3683,
+      "x_req": 3583
+    },
+    {
+      "step": 14,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 8
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":8}"
+      },
+      "source_experiment_id": 3684,
+      "x_req": 3584
+    },
+    {
+      "step": 15,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 9
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":9}"
+      },
+      "source_experiment_id": 3685,
+      "x_req": 3585
+    },
+    {
+      "step": 16,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 10
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":10}"
+      },
+      "source_experiment_id": 3686,
+      "x_req": 3586
+    },
+    {
+      "step": 17,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 11
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":11}"
+      },
+      "source_experiment_id": 3687,
+      "x_req": 3587
+    },
+    {
+      "step": 18,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 12
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":12}"
+      },
+      "source_experiment_id": 3688,
+      "x_req": 3588
+    },
+    {
+      "step": 19,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;40000;86"
+      },
+      "expected": {
+        "status": 423,
+        "body_kind": "json",
+        "body": {
+          "error": "E510",
+          "mensaje": "cuenta bloqueada",
+          "intentos": 13
+        },
+        "raw": "{\"error\":\"E510\",\"mensaje\":\"cuenta bloqueada\",\"intentos\":13}"
+      },
+      "source_experiment_id": 3689,
+      "x_req": 3589
+    }
+  ]
+}

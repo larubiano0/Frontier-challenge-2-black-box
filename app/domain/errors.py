@@ -94,3 +94,11 @@ def e507() -> ServiceError:  # amount > balance: ids 17, 2013-2017
 
 def e510(intentos: int) -> ServiceError:  # blocked source account: ids 1998-2004, 2877-2880
     return ServiceError(423, "E510", "cuenta bloqueada", {"intentos": intentos})
+
+
+def e520() -> ServiceError:  # HALT with argument != "1": ids 2965, 2966, 2973-2980, 2989-2999
+    return ServiceError(409, "E520", "operación destructiva: detiene el servicio; reenvía con confirmación")
+
+
+def e599() -> ServiceError:  # service halted (HALT;1 itself and every later /msg): ids 2981, 3003-3015
+    return ServiceError(503, "E599", "service halted")

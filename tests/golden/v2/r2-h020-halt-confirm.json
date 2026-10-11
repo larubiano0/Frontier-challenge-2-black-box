@@ -1,0 +1,347 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h020-halt-confirm",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-020: forma de confirmación de HALT y su efecto"
+    ],
+    "experiment_ids": [
+      2972,
+      2973,
+      2974,
+      2975,
+      2976,
+      2977,
+      2978,
+      2979,
+      2980,
+      2981,
+      2982,
+      2983,
+      2984,
+      2985,
+      2986,
+      2987
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 2972,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;CONFIRMAR;80"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2973,
+      "x_req": 2909
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;CONFIRM;51"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2974,
+      "x_req": 2910
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;CONFIRMO;9"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2975,
+      "x_req": 2911
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;CONFIRMADO;86"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2976,
+      "x_req": 2912
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;SI;49"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2977,
+      "x_req": 2913
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;YES;69"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2978,
+      "x_req": 2914
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;OK;75"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2979,
+      "x_req": 2915
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;TRUE;81"
+      },
+      "expected": {
+        "status": 409,
+        "body_kind": "json",
+        "body": {
+          "error": "E520",
+          "mensaje": "operación destructiva: detiene el servicio; reenvía con confirmación"
+        },
+        "raw": "{\"error\":\"E520\",\"mensaje\":\"operación destructiva: detiene el servicio; reenvía con confirmación\"}"
+      },
+      "source_experiment_id": 2980,
+      "x_req": 2916
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "HALT;1;19"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 2981,
+      "x_req": 2917
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "PING;64"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 2982,
+      "x_req": 2918
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 503,
+        "body_kind": "json",
+        "body": {
+          "error": "E599",
+          "mensaje": "service halted"
+        },
+        "raw": "{\"error\":\"E599\",\"mensaje\":\"service halted\"}"
+      },
+      "source_experiment_id": 2983,
+      "x_req": 2919
+    },
+    {
+      "step": 12,
+      "kind": "http",
+      "method": "GET",
+      "path": "/health",
+      "request": {
+        "method": "GET",
+        "path": "/health"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 2984,
+      "x_req": null
+    },
+    {
+      "step": 13,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 2985,
+      "x_req": null
+    },
+    {
+      "step": 14,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "PING;64"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 2986,
+      "x_req": 2920
+    },
+    {
+      "step": 15,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 2987,
+      "x_req": 2921
+    }
+  ]
+}

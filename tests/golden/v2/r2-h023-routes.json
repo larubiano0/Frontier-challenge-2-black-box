@@ -1,0 +1,388 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h023-routes",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-023: ¿existe /internal/export-docs (mencionada en NOTAS)? sondeo SIN token real; otras rutas ocultas"
+    ],
+    "experiment_ids": [
+      3356,
+      3357,
+      3358,
+      3359,
+      3360,
+      3361,
+      3362,
+      3363,
+      3364,
+      3365,
+      3366,
+      3367,
+      3368,
+      3369,
+      3370,
+      3371
+    ],
+    "excluded": [],
+    "stateless_without_reset": "ids 3356-3371: unauthenticated/fake-token probes of unknown routes (all 404 E404); no step reads or writes state"
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/export-docs",
+      "request": {
+        "method": "POST",
+        "path": "/internal/export-docs",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3356,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/export-docs",
+      "request": {
+        "method": "POST",
+        "path": "/internal/export-docs",
+        "auth": "bad"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3357,
+      "x_req": null
+    },
+    {
+      "step": 2,
+      "kind": "http",
+      "method": "GET",
+      "path": "/internal/export-docs",
+      "request": {
+        "method": "GET",
+        "path": "/internal/export-docs",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3358,
+      "x_req": null
+    },
+    {
+      "step": 3,
+      "kind": "http",
+      "method": "GET",
+      "path": "/internal/export-docs",
+      "request": {
+        "method": "GET",
+        "path": "/internal/export-docs",
+        "auth": "bad"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3359,
+      "x_req": null
+    },
+    {
+      "step": 4,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal",
+      "request": {
+        "method": "POST",
+        "path": "/internal",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3360,
+      "x_req": null
+    },
+    {
+      "step": 5,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/",
+      "request": {
+        "method": "POST",
+        "path": "/internal/",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3361,
+      "x_req": null
+    },
+    {
+      "step": 6,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/docs",
+      "request": {
+        "method": "POST",
+        "path": "/internal/docs",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3362,
+      "x_req": null
+    },
+    {
+      "step": 7,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/export",
+      "request": {
+        "method": "POST",
+        "path": "/internal/export",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3363,
+      "x_req": null
+    },
+    {
+      "step": 8,
+      "kind": "http",
+      "method": "POST",
+      "path": "/admin",
+      "request": {
+        "method": "POST",
+        "path": "/admin",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3364,
+      "x_req": null
+    },
+    {
+      "step": 9,
+      "kind": "http",
+      "method": "POST",
+      "path": "/debug",
+      "request": {
+        "method": "POST",
+        "path": "/debug",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3365,
+      "x_req": null
+    },
+    {
+      "step": 10,
+      "kind": "http",
+      "method": "POST",
+      "path": "/metrics",
+      "request": {
+        "method": "POST",
+        "path": "/metrics",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3366,
+      "x_req": null
+    },
+    {
+      "step": 11,
+      "kind": "http",
+      "method": "POST",
+      "path": "/version",
+      "request": {
+        "method": "POST",
+        "path": "/version",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3367,
+      "x_req": null
+    },
+    {
+      "step": 12,
+      "kind": "http",
+      "method": "POST",
+      "path": "/docs",
+      "request": {
+        "method": "POST",
+        "path": "/docs",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3368,
+      "x_req": null
+    },
+    {
+      "step": 13,
+      "kind": "http",
+      "method": "POST",
+      "path": "/openapi.json",
+      "request": {
+        "method": "POST",
+        "path": "/openapi.json",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3369,
+      "x_req": null
+    },
+    {
+      "step": 14,
+      "kind": "http",
+      "method": "POST",
+      "path": "/export-docs",
+      "request": {
+        "method": "POST",
+        "path": "/export-docs",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3370,
+      "x_req": null
+    },
+    {
+      "step": 15,
+      "kind": "http",
+      "method": "POST",
+      "path": "/internal/export-docs/",
+      "request": {
+        "method": "POST",
+        "path": "/internal/export-docs/",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3371,
+      "x_req": null
+    }
+  ]
+}

@@ -6,7 +6,7 @@
 
 ## Before doing anything
 
-1. Read `Prompt.md`, `Implement.md`, `Plan.md`, `Documentation.md`, and the organizers' `README.md`. Inspect the existing repository and the supplied examples if present.
+1. Read `Prompt.md`, `Implement.md`, `Plan.md`, `Documentation.md`, and the organizers' `OLD_README.md`. Inspect the existing repository and the supplied examples if present.
 2. Summarize current verified behavior, unresolved hypotheses, implementation/test/deployment status, and available query budget. Treat absent files, missing credentials, and unknown constraints as unknown rather than pretending they exist.
 3. Classify known evidence as: historical v1 / observed v2 / confirmed unchanged / confirmed changed / unknown version status.
 4. State the **current mode** (`PROPOSE`, `INVESTIGATE`, `BUILD`, `VERIFY`, or `HANDOFF`) and the next bounded action. Work on one bounded objective at a time.

@@ -15,7 +15,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from app.core.auth import is_authorized
-from app.domain.errors import ServiceError, e001, e404
+from app.domain.errors import ServiceError, e001, e404, e599
 from app.services.dispatcher import process
 from app.storage.memory import store
 
@@ -37,7 +37,9 @@ def error_response(err: ServiceError) -> Response:
 
 
 async def handle(request: Request) -> Response:
-    key = (request.method.upper(), request.url.path)
+    # Raw, undecoded path without query string: '/m%73g' is NOT '/msg' (id 3725).
+    raw_path = (request.scope.get("raw_path") or request.url.path.encode()).split(b"?", 1)[0].decode("latin-1")
+    key = (request.method.upper(), raw_path)
     if key not in _KNOWN:
         return error_response(e404())
     if not is_authorized(request):
@@ -47,6 +49,8 @@ async def handle(request: Request) -> Response:
     if key == ("POST", "/__reset"):
         store.reset()                                              # clears accounts, ops, counters, blocks
         return json_response(200, {"ok": True})                    # id 1
+    if store.get_state().halted:               # after HALT;1: every /msg -> 503, before size/JSON checks (ids 3003-3015)
+        return error_response(e599())
     raw = await request.body()
     status, body = process(raw, store)                             # synchronous -> atomic per request
     return json_response(status, body, {"X-Req": str(next(_x_req))})

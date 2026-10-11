@@ -1,0 +1,518 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h014-saldo",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-014: formato de saldo para |x|<1 unidad y negativos no múltiplos de 100"
+    ],
+    "experiment_ids": [
+      3690,
+      3691,
+      3692,
+      3693,
+      3694,
+      3695,
+      3696,
+      3697,
+      3698,
+      3699,
+      3700,
+      3701,
+      3702,
+      3703,
+      3704,
+      3705,
+      3706,
+      3707,
+      3708,
+      3709,
+      3710,
+      3711,
+      3712,
+      3713
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3690,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Lucia;82"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0001"
+        },
+        "raw": "{\"cuentaId\":\"AC-0001\"}"
+      },
+      "source_experiment_id": 3691,
+      "x_req": 3590
+    },
+    {
+      "step": 2,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ALTA;Mateo;3"
+      },
+      "expected": {
+        "status": 201,
+        "body_kind": "json",
+        "body": {
+          "cuentaId": "AC-0002"
+        },
+        "raw": "{\"cuentaId\":\"AC-0002\"}"
+      },
+      "source_experiment_id": 3692,
+      "x_req": 3591
+    },
+    {
+      "step": 3,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;50;54"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0001"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 3693,
+      "x_req": 3592
+    },
+    {
+      "step": 4,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "TRANSFER;AC-0001;AC-0002;50;87"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0002"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0002\"}"
+      },
+      "source_experiment_id": 3694,
+      "x_req": 3593
+    },
+    {
+      "step": 5,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0001;72"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true,
+          "anulada": "OP-0001"
+        },
+        "raw": "{\"ok\":true,\"anulada\":\"OP-0001\"}"
+      },
+      "source_experiment_id": 3695,
+      "x_req": 3594
+    },
+    {
+      "step": 6,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "-0.50"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"-0.50\"}"
+      },
+      "source_experiment_id": 3696,
+      "x_req": 3595
+    },
+    {
+      "step": 7,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0002;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0002",
+          "saldo": "0.50"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0002\",\"saldo\":\"0.50\"}"
+      },
+      "source_experiment_id": 3697,
+      "x_req": 3596
+    },
+    {
+      "step": 8,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0002;5;83"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0003"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0003\"}"
+      },
+      "source_experiment_id": 3698,
+      "x_req": 3597
+    },
+    {
+      "step": 9,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0002;11"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0002",
+          "saldo": "0.55"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0002\",\"saldo\":\"0.55\"}"
+      },
+      "source_experiment_id": 3699,
+      "x_req": 3598
+    },
+    {
+      "step": 10,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;7;10"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0004"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0004\"}"
+      },
+      "source_experiment_id": 3700,
+      "x_req": 3599
+    },
+    {
+      "step": 11,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "-0.43"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"-0.43\"}"
+      },
+      "source_experiment_id": 3701,
+      "x_req": 3600
+    },
+    {
+      "step": 12,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;143;50"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0005"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0005\"}"
+      },
+      "source_experiment_id": 3702,
+      "x_req": 3601
+    },
+    {
+      "step": 13,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "1.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"1.00\"}"
+      },
+      "source_experiment_id": 3703,
+      "x_req": 3602
+    },
+    {
+      "step": 14,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0006;57"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E402",
+          "mensaje": "operación inexistente"
+        },
+        "raw": "{\"error\":\"E402\",\"mensaje\":\"operación inexistente\"}"
+      },
+      "source_experiment_id": 3704,
+      "x_req": 3603
+    },
+    {
+      "step": 15,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "1.00"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"1.00\"}"
+      },
+      "source_experiment_id": 3705,
+      "x_req": 3604
+    },
+    {
+      "step": 16,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "ANULA;OP-0005;60"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true,
+          "anulada": "OP-0005"
+        },
+        "raw": "{\"ok\":true,\"anulada\":\"OP-0005\"}"
+      },
+      "source_experiment_id": 3706,
+      "x_req": 3605
+    },
+    {
+      "step": 17,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "-0.43"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"-0.43\"}"
+      },
+      "source_experiment_id": 3707,
+      "x_req": 3606
+    },
+    {
+      "step": 18,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;9999999999;4"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0006"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0006\"}"
+      },
+      "source_experiment_id": 3708,
+      "x_req": 3607
+    },
+    {
+      "step": 19,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "99999999.56"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"99999999.56\"}"
+      },
+      "source_experiment_id": 3709,
+      "x_req": 3608
+    },
+    {
+      "step": 20,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;9999999999;4"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0007"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0007\"}"
+      },
+      "source_experiment_id": 3710,
+      "x_req": 3609
+    },
+    {
+      "step": 21,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;9999999999;4"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0008"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0008\"}"
+      },
+      "source_experiment_id": 3711,
+      "x_req": 3610
+    },
+    {
+      "step": 22,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "DEPOSITO;AC-0001;9999999999;4"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "status": "recieved",
+          "operacionId": "OP-0009"
+        },
+        "raw": "{\"status\":\"recieved\",\"operacionId\":\"OP-0009\"}"
+      },
+      "source_experiment_id": 3712,
+      "x_req": 3611
+    },
+    {
+      "step": 23,
+      "kind": "msg",
+      "method": "POST",
+      "path": "/msg",
+      "request": {
+        "m": "CONSULTA;AC-0001;14"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "cuenta_id": "AC-0001",
+          "saldo": "399999999.53"
+        },
+        "raw": "{\"cuenta_id\":\"AC-0001\",\"saldo\":\"399999999.53\"}"
+      },
+      "source_experiment_id": 3713,
+      "x_req": 3612
+    }
+  ]
+}

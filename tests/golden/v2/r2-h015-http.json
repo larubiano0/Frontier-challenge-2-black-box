@@ -1,0 +1,438 @@
+{
+  "schema": "golden-sequence/1",
+  "version": "v2",
+  "sequence_id": "r2-h015-http",
+  "provenance": {
+    "origin": "original service, VERSION 2 (observed via authorized experiment)",
+    "source": "experimentos.jsonl",
+    "trace": "experimentos_trace.jsonl",
+    "built_by": "tools/build_golden.py",
+    "hipotesis": [
+      "H-015: HEAD/OPTIONS/PATCH/DELETE, query strings, %-encoding, barras extra"
+    ],
+    "experiment_ids": [
+      3714,
+      3715,
+      3716,
+      3717,
+      3718,
+      3719,
+      3720,
+      3721,
+      3722,
+      3723,
+      3724,
+      3725,
+      3726,
+      3727,
+      3728,
+      3729,
+      3730,
+      3731,
+      3732
+    ],
+    "excluded": []
+  },
+  "steps": [
+    {
+      "step": 0,
+      "kind": "reset",
+      "method": "POST",
+      "path": "/__reset",
+      "request": null,
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3714,
+      "x_req": null
+    },
+    {
+      "step": 1,
+      "kind": "http",
+      "method": "HEAD",
+      "path": "/health",
+      "request": {
+        "method": "HEAD",
+        "path": "/health"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "text",
+        "body": "",
+        "raw": ""
+      },
+      "source_experiment_id": 3715,
+      "x_req": null
+    },
+    {
+      "step": 2,
+      "kind": "http",
+      "method": "OPTIONS",
+      "path": "/msg",
+      "request": {
+        "method": "OPTIONS",
+        "path": "/msg"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3716,
+      "x_req": null
+    },
+    {
+      "step": 3,
+      "kind": "http",
+      "method": "OPTIONS",
+      "path": "/health",
+      "request": {
+        "method": "OPTIONS",
+        "path": "/health"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3717,
+      "x_req": null
+    },
+    {
+      "step": 4,
+      "kind": "http",
+      "method": "HEAD",
+      "path": "/msg",
+      "request": {
+        "method": "HEAD",
+        "path": "/msg"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "text",
+        "body": "",
+        "raw": ""
+      },
+      "source_experiment_id": 3718,
+      "x_req": null
+    },
+    {
+      "step": 5,
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/msg",
+      "request": {
+        "method": "PATCH",
+        "path": "/msg",
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3719,
+      "x_req": null
+    },
+    {
+      "step": 6,
+      "kind": "http",
+      "method": "DELETE",
+      "path": "/msg",
+      "request": {
+        "method": "DELETE",
+        "path": "/msg"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3720,
+      "x_req": null
+    },
+    {
+      "step": 7,
+      "kind": "http",
+      "method": "GET",
+      "path": "/health?x=1",
+      "request": {
+        "method": "GET",
+        "path": "/health?x=1"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3721,
+      "x_req": null
+    },
+    {
+      "step": 8,
+      "kind": "http",
+      "method": "POST",
+      "path": "/msg?x=1",
+      "request": {
+        "method": "POST",
+        "path": "/msg?x=1",
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 3722,
+      "x_req": 3613
+    },
+    {
+      "step": 9,
+      "kind": "http",
+      "method": "POST",
+      "path": "/__reset?x=1",
+      "request": {
+        "method": "POST",
+        "path": "/__reset?x=1"
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "ok": true
+        },
+        "raw": "{\"ok\":true}"
+      },
+      "source_experiment_id": 3723,
+      "x_req": null
+    },
+    {
+      "step": 10,
+      "kind": "http",
+      "method": "GET",
+      "path": "/health/",
+      "request": {
+        "method": "GET",
+        "path": "/health/"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3724,
+      "x_req": null
+    },
+    {
+      "step": 11,
+      "kind": "http",
+      "method": "POST",
+      "path": "/m%73g",
+      "request": {
+        "method": "POST",
+        "path": "/m%73g",
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3725,
+      "x_req": null
+    },
+    {
+      "step": 12,
+      "kind": "http",
+      "method": "POST",
+      "path": "//msg",
+      "request": {
+        "method": "POST",
+        "path": "//msg",
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3726,
+      "x_req": null
+    },
+    {
+      "step": 13,
+      "kind": "http",
+      "method": "GET",
+      "path": "/HEALTH",
+      "request": {
+        "method": "GET",
+        "path": "/HEALTH"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3727,
+      "x_req": null
+    },
+    {
+      "step": 14,
+      "kind": "http",
+      "method": "POST",
+      "path": "/__RESET",
+      "request": {
+        "method": "POST",
+        "path": "/__RESET"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3728,
+      "x_req": null
+    },
+    {
+      "step": 15,
+      "kind": "http",
+      "method": "POST",
+      "path": "/msg?",
+      "request": {
+        "method": "POST",
+        "path": "/msg?",
+        "body": {
+          "m": "PING;64"
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body_kind": "json",
+        "body": {
+          "pong": true
+        },
+        "raw": "{\"pong\":true}"
+      },
+      "source_experiment_id": 3729,
+      "x_req": 3614
+    },
+    {
+      "step": 16,
+      "kind": "http",
+      "method": "OPTIONS",
+      "path": "/msg",
+      "request": {
+        "method": "OPTIONS",
+        "path": "/msg",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3730,
+      "x_req": null
+    },
+    {
+      "step": 17,
+      "kind": "http",
+      "method": "HEAD",
+      "path": "/health",
+      "request": {
+        "method": "HEAD",
+        "path": "/health",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "text",
+        "body": "",
+        "raw": ""
+      },
+      "source_experiment_id": 3731,
+      "x_req": null
+    },
+    {
+      "step": 18,
+      "kind": "http",
+      "method": "OPTIONS",
+      "path": "/nope",
+      "request": {
+        "method": "OPTIONS",
+        "path": "/nope",
+        "auth": "none"
+      },
+      "expected": {
+        "status": 404,
+        "body_kind": "json",
+        "body": {
+          "error": "E404",
+          "mensaje": "ruta desconocida"
+        },
+        "raw": "{\"error\":\"E404\",\"mensaje\":\"ruta desconocida\"}"
+      },
+      "source_experiment_id": 3732,
+      "x_req": null
+    }
+  ]
+}

@@ -13,6 +13,7 @@ Comparison rules (README, "Cómo se evalúa"):
 from __future__ import annotations
 
 import json
+import re
 import socket
 import time
 from dataclasses import dataclass, field
@@ -203,33 +204,45 @@ def encode_body(body: dict) -> bytes:
 BAD_LOCAL_TOKEN = "invalid-probe-token"  # mirrors tools/probe.py auth="bad"
 
 
+_TRUNC = re.compile(r"\.\.\.<(\d+) chars>$")
+
+
+def _raw_bytes(raw: str) -> bytes:
+    """Exact raw body. Truncated log records ('...<N chars>') are the padded PING bodies of the
+    body-size probes: '{"m":"PING;64","p":"' + 'a'*(N-22) + '"}' (ids 3015, 3745-3747)."""
+    m = _TRUNC.search(raw)
+    if m:
+        return ('{"m":"PING;64","p":"' + "a" * (int(m.group(1)) - 22) + '"}').encode("utf-8")
+    return raw.encode("utf-8")
+
+
 def _body_bytes(body: Any) -> bytes | None:
     if body is None:
         return None
     if isinstance(body, dict) and set(body) == {"raw"} and isinstance(body["raw"], str):
-        return body["raw"].encode("utf-8")          # exact raw text that was sent
+        return _raw_bytes(body["raw"])              # exact raw text that was sent
     return encode_body(body)
 
 
-def http_of_step(st: dict) -> tuple[str, str, str, bytes | None]:
-    """(method, path, auth, body) to replay a recorded step.
+def http_of_step(st: dict) -> tuple[str, str, str, bytes | None, dict]:
+    """(method, path, auth, body, extra_headers) to replay a recorded step.
 
-    Request-record conventions (tools/replay_original.py, tools/probe.py):
+    Request-record conventions (tools/replay_original.py, tools/probe.py, tools/diffprobe.py):
       * reset with request None                   -> authorized POST /__reset, no body
-      * {"method","path","auth",["body"]}         -> non-ok auth ("none" | "bad")
-      * non-POST-/msg step: {"method","path",["body"]}
+      * {"method","path",["auth"],["body"|"raw"],["headers"]}: explicit HTTP request;
+        auth "ok" (default) | "none" | "bad" | "custom" (exactly `headers`, "<token>" -> local token)
       * POST /msg: {"raw": text} = raw body text; anything else = the JSON body itself
     """
     method = st.get("method", "POST")
     path = st.get("path", "/__reset" if st["kind"] == "reset" else "/msg")
     req = st.get("request")
     if req is None:
-        return method, path, "ok", None
-    meta = isinstance(req, dict) and "method" in req and "path" in req and (
-        "auth" in req or (method, path) != ("POST", "/msg"))
-    if meta:
-        return req["method"], req["path"], req.get("auth", "ok"), _body_bytes(req.get("body"))
-    return method, path, "ok", _body_bytes(req)
+        return method, path, "ok", None, {}
+    if isinstance(req, dict) and "method" in req and "path" in req:
+        body = _raw_bytes(req["raw"]) if isinstance(req.get("raw"), str) else _body_bytes(req.get("body"))
+        hdrs = {k: v.replace("<token>", LOCAL_TEST_TOKEN) for k, v in (req.get("headers") or {}).items()}
+        return req["method"], req["path"], req.get("auth", "ok"), body, hdrs
+    return method, path, "ok", _body_bytes(req), {}
 
 
 def run_sequence(client, seq: dict) -> SequenceResult:
@@ -239,11 +252,12 @@ def run_sequence(client, seq: dict) -> SequenceResult:
     # is not a recorded reset.
     client.post("/__reset", headers=auth)
     for st in seq["steps"]:
-        method, path, auth_kind, content = http_of_step(st)
-        headers = ({} if auth_kind == "none" else
+        method, path, auth_kind, content, extra = http_of_step(st)
+        headers = ({} if auth_kind in ("none", "custom") else
                    {"Authorization": f"Bearer {BAD_LOCAL_TOKEN}"} if auth_kind == "bad" else dict(auth))
         if content is not None:
             headers["Content-Type"] = "application/json"
+        headers.update(extra)
         t0 = time.monotonic()
         resp = client.request(method, path, content=content, headers=headers)
         elapsed = time.monotonic() - t0
